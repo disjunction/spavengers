@@ -12,12 +12,19 @@ function NodeFactory() {
 }
 
 NodeFactory.inherit(Object, {
+	makeNode: function(opts) {
+		if (null == opts) {
+			opts = {};
+		}
+		return new nodes.Node(opts);
+	},
 	makeSprite: function(opts) {
 		return new nodes.Sprite(opts);
 	},
 	makeMap: function(opts) {
+		console.log('make new map!');
 		return new nodes.TMXTiledMap(opts);
 	},
 });
 
-exports.NodeFactory = NodeFactory;
+module.exports = NodeFactory;

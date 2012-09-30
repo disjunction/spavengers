@@ -1,11 +1,13 @@
 var
     geo    = require('geometry'),
-    ccp    = geo.ccp;
+    ccp    = geo.ccp,
+    Parent = require('../abstract/Parent');
 
 function SurfaceDescriptor() {
+	SurfaceDescriptor.superclass.constructor.call(this);
 	this.location = null;
 }
 
-SurfaceDescriptor.inherit(Array);
+SurfaceDescriptor.inherit(Parent);
 
-exports.SurfaceDescriptor = SurfaceDescriptor;
+module.exports = SurfaceDescriptor;

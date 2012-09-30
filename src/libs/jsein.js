@@ -88,6 +88,7 @@ jsein.create = function(className) {
  */
 jsein.registerCtorLocator = function(locator) {
 	jsein.ctorLocators.push(locator);
+	return jsein;
 };
 
 /**
@@ -95,10 +96,10 @@ jsein.registerCtorLocator = function(locator) {
  * @param obj
  */
 jsein.recover = function(obj) {
-	var clone = obj._t? jsein.create(obj._t) : {};
+	var clone = obj._t? jsein.create(obj._t) : (Array.isArray(obj)? [] : {});
 	for (var i in obj)
 		if (i != '_t') 
-			clone[i] = typeof obj[i] =="object"? jsein.recover(obj[i]) : obj[i];
+			clone[i] = (typeof obj[i] == "object")? jsein.recover(obj[i]) : obj[i];
     return clone;
 };
 

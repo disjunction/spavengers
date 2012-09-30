@@ -6,6 +6,6 @@ function LayerMock() {
 	LayerMock.superclass.constructor.call(this);
 }
 
-LayerMock.inherit(require('./NodeMock').NodeMock);
+LayerMock.inherit(require('./NodeMock'));
 
-exports.LayerMock = LayerMock;
+module.exports = LayerMock;

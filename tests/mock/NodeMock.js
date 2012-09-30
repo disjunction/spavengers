@@ -13,4 +13,4 @@ NodeMock.inherit(Object, {
 	
 });
 
-exports.NodeMock = NodeMock;
+module.exports = NodeMock;

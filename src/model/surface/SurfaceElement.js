@@ -1,7 +1,7 @@
 var
     geo    = require('geometry'),
     ccp    = geo.ccp,
-    NodeContainer = require('../visual/NodeContainer').NodeContainer;
+    NodeContainer = require('../visual/NodeContainer');
 
 function SurfaceElement() {
 	SurfaceElement.superclass.constructor.call(this);
@@ -15,7 +15,7 @@ function SurfaceElement() {
 	// how hard it is to ride on this element
 	this.passability = 0;
 	
-	// ccp of the element, used to detect whether it is in the screen
+	// geo.Size of the element, used to detect whether it is in the screen
 	this.size = null;
 	
 	// used to resolve the sprite image
@@ -23,8 +23,10 @@ function SurfaceElement() {
 	
 	// another possibility is "map"
 	this.type = 'sprite';
+	
+	this.shape = "box";
 }
 
 SurfaceElement.inherit(NodeContainer);
 
-exports.SurfaceElement = SurfaceElement;
+module.exports = SurfaceElement;

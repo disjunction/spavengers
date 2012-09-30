@@ -1,14 +1,12 @@
-{
-	_t: 'Field'
-	children: [
-	    {
-	    	_t: 'SurfaceDescriptor',
-	    	_content: [
-	    	     {
-	    	    	 _t: 'SurfaceElement',
-	    	    	 
-	    	     }
-	    	]
+{"_t":"Field", 
+ "children":[
+	{"_t": "SurfaceDescriptor",
+	 "children": [
+	 	{
+	    	"_t": "SurfaceElement",
+	    	"type" : "map",
+	    	"file" : "stars/sol/earth/liberty/map"
 	    }
-	]
-}
+	  ]
+	}
+]}

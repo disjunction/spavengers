@@ -69,6 +69,8 @@ exports.testRecover = function(test) {
 };
 
 exports.testCtorLocators = function(test) {
+	var tmp = jsein.ctorLocators;
+	jsein.ctorLocators = [];
 	jsein.registerCtorLocator(function(name){return require(path + '/model/frame/' + name);});
 	var data = {some: 'world', _t: 'Field'};
 	var o = jsein.recover(data);
@@ -77,5 +79,15 @@ exports.testCtorLocators = function(test) {
 	
 	o.addChild(new Object());
 	test.equals(1, o.children.length);
+	
+	jsein.ctorLocators = tmp;
+	
+	test.done();
+};
+
+exports.testRecoverArray = function(test) {
+	var jsonSrc = '{"a" : [{"b":5, "c":"hello"}]}';
+	var o = jsein.parse(jsonSrc);
+	test.ok(Array.isArray(o.a));
 	test.done();
 };

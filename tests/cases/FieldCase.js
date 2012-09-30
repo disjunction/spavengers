@@ -1,6 +1,7 @@
 var path = require('../bootstrap.js').projectPath,
-	Field = require(path + '/model/frame/Field').Field,
-	testCase = require('nodeunit').testCase;
+	Field = require(path + '/model/frame/Field'),
+	testCase = require('nodeunit').testCase,
+	jsein = require(path + '/libs/jsein');
 
 exports.testFieldChildrenOperations = function(test) {
 	var field = new Field();
@@ -22,5 +23,11 @@ exports.testFieldChildrenOperations = function(test) {
 	
 	field.removeChild(o);
 	
+	test.done();
+};
+
+exports.testGetClass = function(test) {
+	var field = new Field();
+	test.equals('Field', jsein.getClass(field));
 	test.done();
 };

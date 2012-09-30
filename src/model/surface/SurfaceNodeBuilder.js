@@ -15,8 +15,8 @@ SurfaceNodeBuilder.inherit(Object, {
 	 * @param SurfaceDescriptor sd
 	 */
 	makeNodes: function(sd) {
-		for (var i = 0; i < sd.length; i++) {
-			var el = sd[i];
+		for (var i = 0; i < sd.children.length; i++) {
+			var el = sd.children[i];
 			if (null == el.node) {
 				switch (el.type) {
 					case 'sprite':
@@ -41,8 +41,8 @@ SurfaceNodeBuilder.inherit(Object, {
 	 * @param Layer layer
 	 */
 	attachNodes: function(sd, layer) {
-		for (var i = 0; i < sd.length; i++) {
-			var el = sd[i];
+		for (var i = 0; i < sd.children.length; i++) {
+			var el = sd.children[i];
 			if (null != el.node && !el.isAttached) {
 				layer.addChild(el.node);
 				el.isAttached = true;
@@ -51,4 +51,4 @@ SurfaceNodeBuilder.inherit(Object, {
 	},
 });
 
-exports.SurfaceNodeBuilder = SurfaceNodeBuilder;
+module.exports = SurfaceNodeBuilder;

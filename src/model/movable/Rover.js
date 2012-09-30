@@ -1,8 +1,9 @@
-var Enity = require('./Entity').Entity;
+var Entity = require('./Movable');
 
 function Rover () {
-    // You must always call the super class constructor
     Rover.superclass.constructor.call(this);
 }
 
-Spavengers.inherit(Entity);
+Rover.inherit(Entity);
+
+module.exports = Rover;
