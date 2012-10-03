@@ -1,8 +1,12 @@
 var
     geo    = require('geometry'),
+    config = require('../abstract/Config'),
     ccp    = geo.ccp;
 
 function NodeContainer() {
+	NodeContainer.superclass.constructor.call(this);
+	this._location = ccp(0,0);
+	this._angle = 0;
 }
 
 NodeContainer.inherit(Object, {
@@ -15,7 +19,7 @@ NodeContainer.inherit(Object, {
 	get location() {return this._location;},
 	set location(v) {
 		this._location = v;
-		if (this.node != null) this.node.position = geo.ccpMult(v, ccp(32,32)); 
+		if (this.node != null) this.node.position = geo.ccpMult(v, ccp(config.ppm, config.ppm)); 
 	},
 	_location: ccp(0,0),
 	

@@ -22,7 +22,6 @@ NodeFactory.inherit(Object, {
 		return new nodes.Sprite(opts);
 	},
 	makeMap: function(opts) {
-		console.log('make new map!');
 		return new nodes.TMXTiledMap(opts);
 	},
 });

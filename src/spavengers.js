@@ -1,4 +1,4 @@
-"use strict";  // Use strict JavaScript mode
+//"use strict";  // Use strict JavaScript mode
 
 // Import in the modules we're going to use
 var cocos            = require('cocos2d')
@@ -15,16 +15,16 @@ var Director = cocos.Director
   , Point    = geo.Point
   , ccp      = geo.ccp
   , Rect     = geo.Rect
-  , Texture2D = cocos.Texture2D
-  , TMXTiledMap = nodes.TMXTiledMap
-  , RotateBy = actions.RotateBy
   , NodeFactory      = require('/model/visual/NodeFactory')
+  , RoverHud         = require('/model/visual/hud/RoverHud')
   , RoverBodyBuilder = require('/model/movable/RoverBodyBuilder')
-  , RoverNodeBuilder = require('/model/movable/RoverNodeBuilder')
+  , FieldClient = require('/model/client/FieldClient')
   , Rover    = require('/model/movable/Rover')
   , box2d    = require('/libs/box2d')
   , bc       = require('/libs/boxedCocos')
-  , jsein    = require('/libs/jsein').registerCtorLocator(require('/model/infra/ctorLocator'));
+  , jsein    = require('/libs/jsein').registerCtorLocator(require('/model/infra/ctorLocator'))
+  , config   = require('/model/abstract/Config')
+  ;
 
 /**
  * @class Initial application layer
@@ -35,91 +35,39 @@ function Spavengers () {
     Spavengers.superclass.constructor.call(this);
 
     var vlayer = new nodes.Node();
-
-    //var sd = new (require('/model/surface/SurfaceDescriptor'));
-    /*
-    var el = new (require('/model/surface/SurfaceElement'));
-    el.file = 'stars/sol/earth/liberty/map';
-    el.type = 'map';
-    sd.addChild(el);
-    */
-    
-    //sd.addChild(field.getChild(0).getChild(0));
-    
-    var jsonSrc = __jah__.resources['/resources/data/stars/sol/earth/liberty/field.json'].data;
-    var field = jsein.parse(jsonSrc);
-    var sd = field.getChild(0);
-    
-    var nf = new NodeFactory();
-    var nb = new (require('/model/surface/SurfaceNodeBuilder'));
-    nb.nodeFactory = nf;
-    nb.makeNodes(sd);
-    nb.attachNodes(sd, vlayer);
     this.addChild(vlayer);
-
-    
-    var world = new box2d.b2World(
-            new box2d.b2Vec2(0, 0), //gravity
-            false //allow sleep
-        );
-    
-    var car = new Rover();
-    car.location = ccp(1,1);
-    car.size = new geo.Size(1.3, 0.45);
-    
-    var rnb = new RoverNodeBuilder(nf);
-    this.node = rnb.makeNode(car);
-    rnb.attachNode(car, vlayer);
-
-    var rbb = new RoverBodyBuilder(world);
-    this.body = rbb.makeBody(car);
-
-    this.npcs = [];
-    this.npcBodies = [];
-    
-    for (var i = 0; i<5; i++) {
-    	var npc = new Rover();
-    	npc.size = new geo.Size(1.3, 0.45);
-    	npc.location = ccp(3 + Math.random() * 10, 3 + Math.random() * 10);
-    	rnb.makeNode(npc);
-    	rnb.attachNode(npc,vlayer);
-    	this.npcs.push(npc);
-    	this.npcBodies.push(rbb.makeBody(npc));
-    }
-    
-    
-    //var label = new Label({ string:   'Hello World', fontName: 'Arial', fontSize: 20});
-    //label.position = new Point(size.width / 2, size.height / 2);
     
     this.isMouseEnabled = true;
     this.isKeyboardEnabled = true;
     this.vlayer = vlayer;
-    this.car = car;
     
     this.speed = this.torque = 0;
     
-    var me = this;
-    this.go = function() {
-    	/*
-    	me.node.runAction(new actions.MoveBy({duration: 0.07, position: ccp(0, me.speed)}));
-    	me.vlayer.runAction(new actions.MoveBy({duration: 0.07, position: ccp(0, -me.speed)}));
-    	if (me.speed != 0 && me.speed * me.speed < 225) {
-    		me.speed = me.speed * 1.3;
-    	}
-    	console.log('moved by ' + me.speed);
-    	*/
-    };
-    
-    // start BOX2d !!!
-    
-
-    
+    this.hud = new RoverHud(this);
     
     this.crosshair = new Sprite({file: '/resources/sprites/crosshair/yellow_outer.png'});
     this.addChild(this.crosshair);
-
     
-    this.world = world;
+    var me = this;
+    
+    var io = window.parent.io;
+    
+    this.socket = io.connect(config.server.socketUrl);
+    this.socket.on('carInfo', function (data) {
+    	me.car = me.fc.field.getChild(data.childId);
+    });
+    this.socket.on('field', function (data) {
+    	me.field = jsein.parse(data.fieldStr);
+    	var nf = new NodeFactory();
+    	me.fc = new FieldClient(me.field, nf);
+    	me.fc.attachNodes(vlayer);
+    });
+    this.socket.on('updatePack', function (data) {
+    	me.fc.updatePack = data.updatePack;
+    	me.fc.updated = true;
+    	me.hud.feedSps();
+    });
+    
     
     this.scheduleUpdate();
 }
@@ -128,53 +76,44 @@ function Spavengers () {
 Spavengers.inherit(Layer, 
 	{
 	update: function(dt) {
-		this.car.location = ccp(this.body.GetPosition().x, this.body.GetPosition().y);
-		this.car.angle = this.body.GetAngle();
-
-		for (var i = 0; i<this.npcs.length; i++) {
-			var npc = this.npcs[i];
-			npc.location = bc.pointize(this.npcBodies[i].GetPosition());
-			npc.angle = this.npcBodies[i].GetAngle();
+		if (this.fc) {
+			this.fc.update();
 		}
-		
-		this.body.ApplyForce(bc.point2vec(geo.ccpMult(this.car.front, ccp(this.speed,this.speed))), this.car.rearPoint);
-		this.body.ApplyTorque(this.torque);
-		this.world.Step(dt, 10, 10);
-		this.world.ClearForces();
-		
-		var size = Director.sharedDirector.winSize;
-		this.vlayer.position = geo.ccpAdd(geo.ccpNeg(this.node.position), ccp(size.width / 2 ,size.height / 2));
+
+		this.hud.feedFps();
+
+		if (this.car) {
+			var size = Director.sharedDirector.winSize;
+			this.vlayer.position = geo.ccpAdd(geo.ccpNeg(this.car.node.position), ccp(size.width / 2 ,size.height / 2));
+		}
 	},
 	mouseMoved: function(evt) {
     	this.crosshair.position = ccp(evt.locationInCanvas.x, evt.locationInCanvas.y);
     	},
     mouseDragged: function(evt){
-    	//this.vlayer.position = geo.ccpAdd(this.vlayer.position, new geo.Point(evt.deltaX, evt.deltaY));
+    	this.vlayer.position = geo.ccpAdd(this.vlayer.position, new geo.Point(evt.deltaX, evt.deltaY));
     } ,
 	keyDown: function(evt) {
     		switch(evt.keyCode) {
     			case 68:
     			case 39:
-    				this.torque = -20;
+    				this.socket.emit('turn', -15);
     				console.log('left');
     				break;
     			case 65:
     			case 37:
-    				this.torque = 20;
+    				this.socket.emit('turn', 15);
+    				this.torque = 15;
     				console.log('right');
     				break;
     			case 87:
     			case 38:
-    				this.speed = 100;
-    				this.go();
-    				this.moverUp = setInterval(this.go, 100);
+    				this.socket.emit('thrust', 50);
     				console.log('go up');
     				break;
     			case 83:
     			case 40: 
-    				this.speed = -100;
-    				this.go();
-    				this.moverDown = setInterval(this.go, 100);
+    				this.socket.emit('thrust', -50);
     				console.log('go down');
     				break;
     			default:
@@ -187,15 +126,15 @@ Spavengers.inherit(Layer,
 			case 87:				
 			case 40:
 			case 38: 
+				this.socket.emit('thrust', 0);
 				this.speed = 0;
-				clearInterval(this.moverUp);
-				clearInterval(this.moverDown);
 				console.log('stop');
 				break;
 			case 65:
 			case 68:
 			case 37:
 			case 39: 
+				this.socket.emit('turn', 0);
 				this.torque = 0;
 				console.log('stop torque');
 				break;

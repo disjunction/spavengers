@@ -1,6 +1,7 @@
 var path = require('../../bootstrap.js').projectPath,
 	geo    = require('geometry'),
 	ccp    = geo.ccp,
+	jsein = require(path + '/libs/jsein'),
 	Movable = require(path + '/model/movable/Movable');
 
 exports.testAngleChanges = function(test) {
@@ -36,6 +37,25 @@ exports.testFrontRearPoints = function(test) {
 	test.equal(10, Math.round(m.rearPoint.x));
 	test.equal(17, Math.round(m.rearPoint.y));
 
+	
+	test.done();
+};
+
+exports.testStringifyRecover = function(test) {
+	jsein.ctorLocators = [];
+	jsein.registerCtorLocator(require(path + '/model/infra/ctorLocator'));
+	
+	var m = new Movable();
+	m.size = new geo.Size(6,4);
+	m.location = ccp(10,20);
+	
+	var str = jsein.stringify(m);
+	
+	var m2 = jsein.parse(str);
+	test.equal(4, m2.size.height);
+	
+	m2._location = ccp(5,7);
+	test.equal(7, m2.location.y);
 	
 	test.done();
 };

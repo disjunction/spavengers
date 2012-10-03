@@ -8,12 +8,10 @@ var path = require('../../bootstrap.js').projectPath,
 exports.testMakeNodesAndAttach = function(test) {
 	var sd = new SurfaceDescriptor(),
 	    el = new SurfaceElement(),
-	    nf = new NodeFactoryMock(),
-	    nb = new SurfaceNodeBuilder(),
+	    nb = new SurfaceNodeBuilder(new NodeFactoryMock()),
 	    l = new LayerMock();
 	
 	sd.addChild(el);
-	nb.nodeFactory = nf;
 	
 	test.equal(null, el.node);
 	nb.makeNodes(sd);

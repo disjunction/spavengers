@@ -7,6 +7,5 @@ exports.testAddingElements = function(test) {
 	var el = new SurfaceElement();
 	sd.addChild(el);
 	test.equals(1, sd.children.length);
-	
 	test.done();
 };

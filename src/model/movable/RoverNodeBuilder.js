@@ -1,5 +1,6 @@
 var
     geo    = require('geometry'),
+    config = require('../abstract/Config'),
     ccp    = geo.ccp;
 
 /**
@@ -26,7 +27,8 @@ RoverNodeBuilder.inherit(Object, {
 	    
 	    node.addChild(carSprite);
 	    node.addChild(cannonSprite);
-	    node.position = geo.ccpMult(rover.location, ccp(32, 32));
+	    node.position = geo.ccpMult(rover.location, ccp(config.ppm, config.ppm));
+	    node.rotation = geo.radiansToDegrees(-rover.angle);
 	    
 	    rover.node = node;
 	    
@@ -37,9 +39,11 @@ RoverNodeBuilder.inherit(Object, {
 	 * @param Layer layer
 	 */
 	attachNode: function(rover, layer) {
+		if (rover.node == null) this.makeNode(rover);
 		layer.addChild(rover.node);
 		rover.isAttached = true;
-	}
+	}	
+	
 });
 
 module.exports = RoverNodeBuilder;

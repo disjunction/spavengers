@@ -14,10 +14,14 @@ exports.testStringify = function(test) {
 
 	o.a = 5;
 	o.c = new another(123, 22);
-
 	var str = jsein.stringify(o);
-
 	test.ok(str.length > 0);
+	
+	o = {a: [1,2]};
+	str = jsein.stringify(o);
+	console.log(str);
+	test.ok(str.length > 0);
+	
 	test.done();
 };
 

@@ -32,6 +32,7 @@
         </style>
     </head>
     <body>
+    <script src="http://spavengers.local:4444/socket.io/socket.io.js"></script>
         <h1>Spavengers</h1>
         <div class="cocos2d-app">
             Loading Spavengers...

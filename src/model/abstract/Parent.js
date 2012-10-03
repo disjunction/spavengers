@@ -1,4 +1,5 @@
 function Parent() {
+	this.children = [];
 }
 
 Parent.inherit(Object, {

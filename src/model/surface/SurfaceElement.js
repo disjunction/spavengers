@@ -15,15 +15,13 @@ function SurfaceElement() {
 	// how hard it is to ride on this element
 	this.passability = 0;
 	
-	// geo.Size of the element, used to detect whether it is in the screen
-	this.size = null;
-	
 	// used to resolve the sprite image
 	this.file = 'dummy';
 	
 	// another possibility is "map"
 	this.type = 'sprite';
 	
+	// can be "box" or "circle"
 	this.shape = "box";
 }
 

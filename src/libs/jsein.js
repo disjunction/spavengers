@@ -40,9 +40,15 @@ jsein.clone = function(obj, onlyContent) {
 };
 
 jsein.getClass = function(obj) {
-	if (typeof obj != "object" || obj === null) throw new Error('calling getClass on non-object');
-	var exp = /(\w+)\(/;
-	return exp.exec(obj.constructor.toString())[1];
+	if (obj === null) return 'Object';
+	
+	if (typeof obj != "object") throw new Error('calling getClass on ' + typeof obj);
+	var exp = /(\w+)\(/,
+		res = exp.exec(obj.constructor.toString());
+	if (!res || res.length < 2) {
+		return 'Object';
+	}
+	return res[1];
 };
 
 /**
@@ -51,14 +57,24 @@ jsein.getClass = function(obj) {
  *
  * @param Object obj
  */
-jsein.cloneWithTypes = function(obj) {
-	var clone = {},
-		type = jsein.getClass(obj);
+jsein.cloneWithTypes = function(obj, predefinedType) {
+	if (obj === null) return null;
+	var clone = Array.isArray(obj)? [] : {};
+	var type = predefinedType? predefinedType : jsein.getClass(obj);
+
 	for (var i in obj) {
-		clone[i] = typeof obj[i] =="object"? jsein.cloneWithTypes(obj[i]) : obj[i]; 
+		if (obj.__lookupGetter__(i) || obj.__lookupSetter__(i)) continue;
+		if (typeof obj[i] =="object") {
+			
+			var lowType = jsein.getClass(obj[i]);
+			
+			clone[i] = jsein.cloneWithTypes(obj[i], lowType);
+		} else {
+			clone[i] = obj[i]; 
+		}
     }
 	
-	if (type != 'Object') {
+	if (type != 'Object' && !Array.isArray(obj)) {
 		clone._t = type;
 	}
 	return clone;
@@ -96,10 +112,21 @@ jsein.registerCtorLocator = function(locator) {
  * @param obj
  */
 jsein.recover = function(obj) {
+	if (obj === null) {
+		return null;
+	}
 	var clone = obj._t? jsein.create(obj._t) : (Array.isArray(obj)? [] : {});
-	for (var i in obj)
+	for (var i in obj) {
+	
+		// VERY EVIL HACK ]:-)
+		if (i == 'angleDeg') {
+			clone.angle = obj[i] / 180 * Math.PI;
+			continue;
+		}
+		
 		if (i != '_t') 
 			clone[i] = (typeof obj[i] == "object")? jsein.recover(obj[i]) : obj[i];
+	}
     return clone;
 };
 
