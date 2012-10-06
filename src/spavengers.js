@@ -56,6 +56,12 @@ function Spavengers () {
     this.socket.on('carInfo', function (data) {
     	me.car = me.fc.field.getChild(data.childId);
     });
+    this.socket.on('addCar', function (data) {
+    	me.fc.addCar(jsein.parse(data.carStr));
+    });
+    this.socket.on('removeChildId', function (data) {
+    	me.fc.removeChildId(data.childId);
+    });
     this.socket.on('field', function (data) {
     	me.field = jsein.parse(data.fieldStr);
     	var nf = new NodeFactory();

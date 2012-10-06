@@ -1,4 +1,4 @@
-var path = require('../bootstrap.js').projectPath,
+var path = require('../../bootstrap.js').projectPath,
 	jsein = require(path + '/libs/jsein');
 
 exports.testStringify = function(test) {
@@ -19,7 +19,6 @@ exports.testStringify = function(test) {
 	
 	o = {a: [1,2]};
 	str = jsein.stringify(o);
-	console.log(str);
 	test.ok(str.length > 0);
 	
 	test.done();

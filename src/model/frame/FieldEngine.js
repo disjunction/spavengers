@@ -108,7 +108,7 @@ FieldEngine.inherit(Object, {
 	    return car;
 	},
 	removeCar: function(car) {
-		
+		this.field.removeChild(car.childId);
 	}
 });
 

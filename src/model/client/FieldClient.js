@@ -38,12 +38,20 @@ FieldClient.inherit(Object, {
 			for (var i in this.updatePack.movable) {
 	    		var el = this.updatePack.movable[i];
 	    		if (el != null) {
-		    		this.field.getChild(i).location = el.l;
-		    		this.field.getChild(i).angle = el.a;
+	    			if (this.field.getChild(i)) {
+			    		this.field.getChild(i).location = el.l;
+			    		this.field.getChild(i).angle = el.a;
+	    			}
 	    		}
 	    	}
 			this.updated = false;
 		}
+	},
+	addCar: function(car) {
+		
+	},
+	removeChildId: function(childId) {
+		
 	}
 });
 
