@@ -6,7 +6,6 @@ var
 function Field() {
     Field.superclass.constructor.call(this);
 	this.size = ccp(100, 100);
-	this.children = [];
 }
 
 Field.inherit(Parent, {
@@ -25,7 +24,7 @@ Field.inherit(Parent, {
 		if (null != this._fullUpdatePack) return this._fullUpdatePack; 
 		
 		var result = {};
-		result.movable = [];
+		result.movable = {};
 		for (var i in this.children) {
 			var child = this.children[i];
 			if (!child || !child.awake) continue;

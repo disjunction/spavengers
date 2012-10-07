@@ -6,21 +6,34 @@ exports.testFieldChildrenOperations = function(test) {
 	var field = new Field();
 	var o = new Object();
 	field.addChild(o);
-	test.ok(field.children.length > 0);
-	
-	test.equal(0, o.childId);
+	test.equal("A", o.childId);
 	
 	o = new Object();
 	o.prop = 'aaa';
 	field.addChild(o);
-	test.equal(1, o.childId);
+	test.equal("B", o.childId);
 	
+	// if childId is assigned, then it's used
 	o = new Object();
-	o.childId = 3;
+	o.childId = "abc";
 	field.addChild(o);
-	test.equals('aaa', field.getChild(1).prop);
+	test.equal('aaa', field.getChild("B").prop);
+	test.equal(null, field.getChild("C"));
+	test.notEqual(null, field.getChild("abc"));
 	
+	// removal removes ;)
+	test.ok(field.getChild("abc"));
+	test.equal(3, field.childIds.length);
 	field.removeChild(o);
+	test.equal(null, field.getChild("abc"));
+	test.equal(2, field.childIds.length);
+	
+	// inconsistent counter doesn't break the logic
+	o = new Object();
+	o.z = 'some';
+	field.counter = 0;
+	field.addChild(o);
+	test.equal('some', field.getChild("C").z);
 	
 	test.done();
 };

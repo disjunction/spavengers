@@ -4,6 +4,7 @@ var
 		Field: require('../frame/Field'),
 		SurfaceDescriptor: require('../surface/SurfaceDescriptor'),
 		SurfaceElement: require('../surface/SurfaceElement'),
+		Mount: require('../movable/Mount'),
 		Movable: require('../movable/Movable'),
 		Rover: require('../movable/Rover'),
 		Point: geo.Point,

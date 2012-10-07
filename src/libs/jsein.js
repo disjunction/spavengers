@@ -27,6 +27,7 @@ jsein.convertObject = function (className, data) {
  * @returns Object
  */
 jsein.clone = function(obj, onlyContent) {
+	if (typeof obj != "object") return obj;
 	var clone = {};
     for (var i in obj) {
         if (typeof obj[i] =="object")

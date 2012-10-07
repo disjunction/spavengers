@@ -45,7 +45,7 @@ SurfaceBodyBuilder.inherit(Object, {
 	makeBodies: function(sd, level) {
 		if (null == level) level = 1;
 		
-		for (var i = 0; i < sd.children.length; i++) {
+		for (var i in sd.children) {
 			var el = sd.children[i];
 			if (el.level == level) {
 				this.makeBody(el);

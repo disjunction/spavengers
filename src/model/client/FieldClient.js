@@ -1,6 +1,7 @@
 var
     geo    = require('geometry'),
     config = require('../abstract/Config'),
+    MountNodeBuilder = require('../movable/MountNodeBuilder'),
     SurfaceNodeBuilder = require('../surface/SurfaceNodeBuilder'),
     RoverNodeBuilder = require('../movable/RoverNodeBuilder'),
     ccp    = geo.ccp;
@@ -9,14 +10,18 @@ function FieldClient(field, nodeFactory) {
 	FieldClient.superclass.constructor.call(this);
 	this.field = field;
 	this.nodeFactory = nodeFactory;
+	this.mountNodeBuilder = new MountNodeBuilder(nodeFactory);
+	this.roverNodeBuilder = new RoverNodeBuilder(this.mountNodeBuilder);
+	this.surfaceNodeBuilder = new SurfaceNodeBuilder(nodeFactory);
+	
 	this.rovers = [];
 	this.surfaces = [];
 }
 
 FieldClient.inherit(Object, {
 	attachNodes: function(layer) {
-		var snb = new SurfaceNodeBuilder(this.nodeFactory),
-			rnb = new RoverNodeBuilder(this.nodeFactory);
+		var snb = this.surfaceNodeBuilder,
+			rnb = this.roverNodeBuilder;
 		
 		this.rovers = [];
 		this.surfaces = [];
@@ -32,6 +37,8 @@ FieldClient.inherit(Object, {
 				snb.attachNodes(el, layer);
 			}
 		}
+		
+		this.layer = layer;
 	},
 	update: function() {
 		if (this.updated) {
@@ -48,10 +55,14 @@ FieldClient.inherit(Object, {
 		}
 	},
 	addCar: function(car) {
-		
+		this.field.addChild(car);
+		this.rovers.push(car);
+		this.roverNodeBuilder.attachNode(car, this.layer);
 	},
 	removeChildId: function(childId) {
-		
+		console.log(this.field.getChild(childId).node);
+		this.layer.removeChild(this.field.getChild(childId).node);
+		this.field.removeChildId(childId);
 	}
 });
 

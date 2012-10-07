@@ -47,11 +47,11 @@ function main() {
 	io.sockets.on('connection', function (socket) {
 		 console.log((new Date()) + ' Connection !');
 		 
-		 var car = fieldEngine.addCar();
-		 
 		 socket.emit('field', {fieldStr: jsein.stringify(fieldEngine.field)});
-		 socket.emit('carInfo', {childId: car.childId});
+		 var car = fieldEngine.addCar();
+		 console.log(car);
 		 io.sockets.emit('addCar', {carStr: jsein.stringify(car)});
+		 socket.emit('carInfo', {childId: car.childId});
 
 		 var index = '' + clientCounter++;
 		 console.log((new Date()) + ' index ' + index);
@@ -74,9 +74,9 @@ function main() {
 		 });
 		 
 		 socket.on('disconnect', function() {
-			console.log('disconnect!!! ooooo');
+			console.log('disconnect for car: ' + car.childId);
 			fieldEngine.removeCar(car);
-			io.sockets.emit('removeCar', {childId: car.childId});
+			io.sockets.emit('removeChild', {childId: car.childId});
 		 });
 	
 	});

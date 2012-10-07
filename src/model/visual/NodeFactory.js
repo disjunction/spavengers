@@ -23,7 +23,7 @@ NodeFactory.inherit(Object, {
 	},
 	makeMap: function(opts) {
 		return new nodes.TMXTiledMap(opts);
-	},
+	}
 });
 
 module.exports = NodeFactory;

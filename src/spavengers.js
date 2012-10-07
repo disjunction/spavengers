@@ -40,12 +40,14 @@ function Spavengers () {
     this.isMouseEnabled = true;
     this.isKeyboardEnabled = true;
     this.vlayer = vlayer;
+
     
     this.speed = this.torque = 0;
     
     this.hud = new RoverHud(this);
     
     this.crosshair = new Sprite({file: '/resources/sprites/crosshair/yellow_outer.png'});
+    //this.vlayer.runAction(new actions.ScaleBy({duration: 5, scale: 0.2}));
     this.addChild(this.crosshair);
     
     var me = this;
@@ -59,7 +61,7 @@ function Spavengers () {
     this.socket.on('addCar', function (data) {
     	me.fc.addCar(jsein.parse(data.carStr));
     });
-    this.socket.on('removeChildId', function (data) {
+    this.socket.on('removeChild', function (data) {
     	me.fc.removeChildId(data.childId);
     });
     this.socket.on('field', function (data) {

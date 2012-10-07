@@ -44,7 +44,7 @@ exports.testMakeBatchBodies = function(test) {
 		el1 = new SurfaceElement(),
 		el2 = new SurfaceElement(),
 		el3 = new SurfaceElement();
-	
+		
 	el1.level = 1;
 	el1.location = ccp(5, 6);
 	el1.size = new geo.Size(3, 2);
@@ -69,8 +69,6 @@ exports.testMakeBatchBodies = function(test) {
     		i++;
     	}
     }
-
-    // the last one is parasite body
     test.equal(2, i);
     
     var self = this, testVec;

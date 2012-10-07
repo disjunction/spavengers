@@ -54,7 +54,7 @@ exports.testStringifyRecover = function(test) {
 	var m2 = jsein.parse(str);
 	test.equal(4, m2.size.height);
 	
-	m2._location = ccp(5,7);
+	m2._l = ccp(5,7);
 	test.equal(7, m2.location.y);
 	
 	test.done();

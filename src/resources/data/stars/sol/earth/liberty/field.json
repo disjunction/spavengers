@@ -1,13 +1,13 @@
 {"_t":"Field", 
- "children":[
-	{"_t": "SurfaceDescriptor",
-	 "children": [
-	 	{
+"children": {
+	"A" : {"_t": "SurfaceDescriptor",
+	 "children": {
+	 	"A": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "map",
 	    	"file" : "stars/sol/earth/liberty/map"
 	    },
-	    {
+	    "B": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -22,7 +22,7 @@
 	    	"angleDeg" : 90,
 	    	"level": 1
 	    },
-	    {
+	    "C": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -37,7 +37,7 @@
 	    	"angleDeg" : 90,
 	    	"level": 1
 	    },
-	    {
+	    "D": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -51,7 +51,7 @@
 	    	},
 	    	"level": 1
 	    },
-	    {
+	    "E": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -65,7 +65,7 @@
 	    	},
 	    	"level": 1
 	    },
-	    {
+	    "F": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -80,7 +80,7 @@
 	    	"angleDeg": -60,
 	    	"level": 1
 	    },
-	    {
+	    "G": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -95,6 +95,7 @@
 	    	"angleDeg": -120,
 	    	"level": 1
 	    }
-	  ]
+	  }
 	}
-]}
+}
+}

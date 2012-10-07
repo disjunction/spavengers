@@ -81,7 +81,7 @@ exports.testCtorLocators = function(test) {
 	test.equals('world', o.some);
 	
 	o.addChild(new Object());
-	test.equals(1, o.children.length);
+	test.equals(1, o.childIds.length);
 	
 	jsein.ctorLocators = tmp;
 	

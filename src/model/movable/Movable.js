@@ -12,14 +12,14 @@ function Movable() {
 Movable.inherit(NodeContainer, {
 	size: new geo.Size(1,1),
 	
-	get front() {if (this.angleChanged) this.resetFront(); return this._front;},
+	get front() {if (this.angleChanged) this.resetFront(); return this._f;},
 	set front(v) {throw new Error('use resetFront instead of direct setting it');},
-	_front: ccp(0, 0),
+	_f: ccp(0, 0),
 	
 	resetFront: function() {
 		var half = this.size.width / 2;
-		this._front.x = half * Math.cos(this.angle);
-		this._front.y = half * Math.sin(this.angle);
+		this._f.x = half * Math.cos(this.angle);
+		this._f.y = half * Math.sin(this.angle);
 		this.angleChanged = false;
 	},
 	
