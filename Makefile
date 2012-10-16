@@ -4,6 +4,8 @@ PRODUCTION_SSH=pluseq@pluseq.com
 all: clean build
 build:
 	cocos make
+	cp -r extras/sounds build/
+	cp -r extras/music build/
 clean:
 	rm -rf build
 production_rsync:

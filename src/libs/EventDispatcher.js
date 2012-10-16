@@ -1,13 +1,17 @@
 //Copyright (c) 2010 Nicholas C. Zakas. All rights reserved.
 //MIT License
 
-Reyode.EventDispatcher = function() {
+/**
+ * borrowed from http://www.nczonline.net/blog/2010/03/09/custom-events-in-javascript/
+ * added context to hardly bind listeners
+ * @see EventDispatcherCase
+ */
+var EventDispatcher = function() {
 	this.listeners = {};
 };
-Reyode.EventDispatcher.prototype = {
-	constructor: Reyode.EventDispatcher,
-	addListener: function (type, listener, context) {
-		listener.context = context;
+EventDispatcher.prototype = {
+	constructor: EventDispatcher,
+	addListener: function (type, listener) {
 		if (typeof this.listeners[type] == "undefined"){
             this.listeners[type] = [];
         }
@@ -27,14 +31,12 @@ Reyode.EventDispatcher.prototype = {
         if (typeof this.listeners[event.type] != 'undefined'){
             var listeners = this.listeners[event.type];
             for (var i=0, len=listeners.length; i < len; i++){
-                var context = listeners[i].context == null? this : listeners[i].context;
-            	listeners[i].call(context, event);
+            	listeners[i].call(this, event);
             }
         }
     },
-    removeListener: function(type, listener, context){
-    	listener.context = context;
-        if (this._listeners[type] instanceof Array){
+    removeListener: function(type, listener){
+        if (this.listeners[type] instanceof Array){
             var listeners = this.listeners[type];
             for (var i=0, len=listeners.length; i < len; i++){
                 if (listeners[i] === listener){
@@ -45,3 +47,5 @@ Reyode.EventDispatcher.prototype = {
         }
     }
 };
+
+module.exports = EventDispatcher;

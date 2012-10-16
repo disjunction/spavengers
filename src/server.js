@@ -44,9 +44,17 @@ function main() {
 	
 	io.set('log level', 1);
 	
+	var broadcastEventProxy = function(event) {
+		 var e = jsein.clone(event),
+		 	  type = e.type;
+		 delete e.type;
+		 io.sockets.emit(type, e);
+	};
+	fieldEngine.events.addListener('update', broadcastEventProxy);
+	
 	io.sockets.on('connection', function (socket) {
 		 console.log((new Date()) + ' Connection !');
-		 
+		 socket.emit('helo');
 		 socket.emit('field', {fieldStr: jsein.stringify(fieldEngine.field)});
 		 var car = fieldEngine.addCar();
 		 console.log(car);
@@ -67,6 +75,15 @@ function main() {
 
 		 socket.on('turn', function (data) {
 			 car.torque = data;
+		 });
+		 
+		 socket.on('towerOmega', function (data) {
+			 car.towerOmega = data;
+		 });
+		 
+		 // data: {mountName: ..., _l: ..., _a: ...}
+		 socket.on('shootMount', function (data) {
+			 fieldEngine.shootMount(car, data);
 		 });
 		 
 		 socket.on('thrust', function (data) {

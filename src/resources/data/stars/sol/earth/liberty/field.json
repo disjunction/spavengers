@@ -5,67 +5,9 @@
 	 	"A": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "map",
-	    	"file" : "stars/sol/earth/liberty/map"
+	    	"file" : "stars/sol/earth/liberty/ground_field"
 	    },
 	    "B": {
-	    	"_t": "SurfaceElement",
-	    	"type" : "sprite",
-	    	"file" : "city/house1",
-	    	"size" : {
-	    		"width": 10,
-	    		"height": 6
-	    	},
-	    	"location": {
-	    		"x": -3,
-	    		"y": 7
-	    	},
-	    	"angleDeg" : 90,
-	    	"level": 1
-	    },
-	    "C": {
-	    	"_t": "SurfaceElement",
-	    	"type" : "sprite",
-	    	"file" : "city/house1",
-	    	"size" : {
-	    		"width": 10,
-	    		"height": 6
-	    	},
-	    	"location": {
-	    		"x": -3,
-	    		"y": -3
-	    	},
-	    	"angleDeg" : 90,
-	    	"level": 1
-	    },
-	    "D": {
-	    	"_t": "SurfaceElement",
-	    	"type" : "sprite",
-	    	"file" : "city/house1",
-	    	"size" : {
-	    		"width": 10,
-	    		"height": 6
-	    	},
-	    	"location": {
-	    		"x": 5,
-	    		"y": -3
-	    	},
-	    	"level": 1
-	    },
-	    "E": {
-	    	"_t": "SurfaceElement",
-	    	"type" : "sprite",
-	    	"file" : "city/house1",
-	    	"size" : {
-	    		"width": 10,
-	    		"height": 6
-	    	},
-	    	"location": {
-	    		"x": 15,
-	    		"y": -3
-	    	},
-	    	"level": 1
-	    },
-	    "F": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",
@@ -80,7 +22,7 @@
 	    	"angleDeg": -60,
 	    	"level": 1
 	    },
-	    "G": {
+	    "C": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "sprite",
 	    	"file" : "city/house1",

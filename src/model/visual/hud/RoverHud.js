@@ -27,6 +27,11 @@ function RoverHud(layer) {
 	this.spsLabel.position = ccp(10, 60);
     this.node.addChild(this.spsLabel);
 	
+    this.messageLabel = new nodes.Label({ string: '', fontName: 'Arial', fontSize: 10, fontColor: 'yellow'});
+    this.messageLabel.anchorPoint = ccp(0,0);
+	this.messageLabel.position = ccp(10, 40);
+    this.node.addChild(this.messageLabel);
+    
 	layer.addChild(this.node);
 	
 	var me = this;
@@ -51,6 +56,9 @@ RoverHud.inherit(Object, {
 	feedSps: function() {
 		this.box2dOldTime = this.box2dNewTime+ 0;
 		this.box2dNewTime = (new Date()).getTime();
+	},
+	showMessage: function(string) {
+		this.messageLabel.string = string;
 	}
 
 });

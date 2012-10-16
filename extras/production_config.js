@@ -6,7 +6,7 @@ Config.inherit(Object, {
 	ppm: 36,
 	
 	server: {
-		port: 4444,
+		port: 9600,
 		socketUrl: 'http://spavengers.pluseq.com:4444/'
 	}
 });

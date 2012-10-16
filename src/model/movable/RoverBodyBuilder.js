@@ -26,6 +26,9 @@ RoverBodyBuilder.inherit(Object, {
 	    var body = this.world.CreateBody(bodyDef);
 	    body.SetAngle(rover.angle); 
 	    body.CreateFixture(fixDef);
+	    
+	    body.childId = rover.childId;
+	    
 	    return body;
 	}
 });

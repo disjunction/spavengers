@@ -11,14 +11,26 @@ var
   , RoverBodyBuilder = require('../movable/RoverBodyBuilder')
   , RoverNodeBuilder = require('../movable/RoverNodeBuilder')
   , Rover    = require('../movable/Rover')
+  
+  , SurfaceDescriptor    = require('../surface/SurfaceDescriptor')
+  , SurfaceElement    = require('../surface/SurfaceElement')
+  
   , box2d    = require('../../libs/box2d')
   , bc       = require('../../libs/boxedCocos')
-  , jsein    = require('../../libs/jsein').registerCtorLocator(require('../infra/ctorLocator'));
+  , jsein    = require('../../libs/jsein').registerCtorLocator(require('../infra/ctorLocator'))
+  , RayCaster = require('../../libs/RayCaster')
+  , EventDispatcher  = require('../../libs/EventDispatcher');
 
 function FieldEngine() {
     FieldEngine.superclass.constructor.call(this);
     this.mountFactory = new MountFactory();
     this.roverFactory = new RoverFactory(this.mountFactory);
+    
+    this.events = new EventDispatcher();
+}
+
+function round3(x) {
+	return Math.round(x*1000)/1000;
 }
 
 FieldEngine.inherit(Object, {
@@ -26,26 +38,71 @@ FieldEngine.inherit(Object, {
 	    var world = new box2d.b2World(new box2d.b2Vec2(0, 0), true);	    
 	    var jsonSrc = require('../../resources/data/stars/sol/earth/liberty/field.json');
 	    var field = jsein.recover(jsonSrc);
+	    
 	    var sd = field.getChild("A");
-	    	    
+	    
 	    var sbb = new (require('../surface/SurfaceBodyBuilder'))(world);
 	    sbb.makeBodies(sd);
 	    
-	    var size = new geo.Size(2.27, 1.16);
+    	function makeEl() {
+    		var el = new SurfaceElement();
+	    	el.type = "sprite";
+	    	el.file = "city/house1";
+	    	el.size = geo.sizeMake(10,6);
+	    	el.angle = 0;
+	    	el.level = 1;
+    		return el;
+    	}
+	    
+	    // random houses
+	    var sd = new SurfaceDescriptor();
+	    for (var i = 0; i < 50; i++) {
+	    	var el = makeEl();
+	    	el.location = ccp(20 + Math.random() * 100, 20 + Math.random() * 100);
+	    	el.angle = Math.random() * Math.PI * 2;
+	    	sd.addChild(el);
+	    }
+	    field.addChild(sd);
+	    sbb.makeBodies(sd);
+	    
+	    // margin houses
+	    var sd = new SurfaceDescriptor();
+	    
+	    for (var i = -1; i < 28; i++) {	    	
+	    	var el;
+	    	
+	    	el = makeEl();
+	    	el.location = ccp(i * 10 + 5, 280-3);
+	    	sd.addChild(el);
+	    	
+	    	el = makeEl();
+	    	el.location = ccp(i * 10 + 5, -3);
+	    	sd.addChild(el);
+	    	
+	    	el = makeEl();
+	    	el.angle = Math.PI/2;
+	    	el.location = ccp(-3, i * 10 + 5);
+	    	sd.addChild(el);
+	    	
+	    	el = makeEl();
+	    	el.angle = Math.PI/2;
+	    	el.location = ccp(280-3, i * 10 + 5);
+	    	sd.addChild(el);
+	    }
+	    field.addChild(sd);
+	    sbb.makeBodies(sd);
+	    
+	    // random rovers
 	    var rbb = new RoverBodyBuilder(world);
 
 	    this.npcs = new Parent();
 	    this.npcBodies = new Parent();
 	    
-	    for (var i = 0; i<20; i++) {
-	    	/*
-	    	var npc = new Rover();
-	    	npc.size = size;
-	    	npc.location = ccp(3 + Math.random() * 10, 3 + Math.random() * 10);
-	    	npc.angle = Math.random() * Math.PI * 2;
-	    	*/
+	    this.bodies = new Parent();
+	    
+	    for (var i = 0; i<30; i++) {
 	    	var npc = this.roverFactory.makeRover({hull: 'bobik'});
-	    	npc.location = ccp(3 + Math.random() * 10, 3 + Math.random() * 10);
+	    	npc.location = ccp(3 + Math.random() * 30, 3 + Math.random() * 30);
 	    	npc.angle = Math.random() * Math.PI * 2;
 	    	
 	    	// first insert into field, to get a unique childId
@@ -55,10 +112,8 @@ FieldEngine.inherit(Object, {
 	    	var body = rbb.makeBody(npc);
 	    	body.SetLinearVelocity(ccp(2,2));
 	    	
-	    	// make sure the body has the same childId as the npc in field
-	    	body.childId = npc.childId;
-	    	
 	    	this.npcBodies.addChild(body);
+	    	this.bodies.addChild(body);
 	    }
 	    
 	    this.cars = new Parent();
@@ -67,6 +122,7 @@ FieldEngine.inherit(Object, {
 	    this.field = field;
 	    this.speed = this.torque = 0;
 	    this.world = world;
+	    this.rayCaster = new RayCaster(world);
 	},
 	updateField: function() {
 		for (var i in this.npcs.children) {
@@ -104,7 +160,15 @@ FieldEngine.inherit(Object, {
 			}
 			var thrust = car.thrust;
 			if (car != null && thrust != null && thrust !=0) {
-				carBody.ApplyForce(bc.point2vec(geo.ccpMult(car.front, ccp(thrust, thrust))), car.rearPoint);
+				carBody.ApplyForce(geo.ccpMult(car.front, ccp(thrust, thrust)), car.rearPoint);
+			}
+			if (car.towerOmega) {
+				for (var j in car.towerOmega) {
+					if (car.mounts[j] && car.towerOmega[j] != 0) {
+						car.mounts[j].angle += car.towerOmega[j] * (newTime - this.oldTime) / 1000;
+						carBody.SetAwake(true);
+					}
+				}
 			}
 		}
 		
@@ -128,6 +192,7 @@ FieldEngine.inherit(Object, {
 	    carBody.childId = car.childId;
 	    this.cars.addChild(car);
 	    this.carBodies.addChild(carBody);
+	    this.bodies.addChild(carBody);
 	    
 	    return car;
 	},
@@ -135,7 +200,50 @@ FieldEngine.inherit(Object, {
 		this.world.DestroyBody(this.carBodies.getChild(car.childId));
 		this.carBodies.removeChildId(car.childId);
 		this.cars.removeChildId(car.childId);
+		this.bodies.removeChildId(car.childId);
 		this.field.removeChildId(car.childId);
+	},
+	
+	/**
+	 * @param object opts {mountName: ..., _l: location, _a: angle} 
+	 */
+	shootMount: function(car, data) {
+		var d = 7;
+		
+		var forceUnit = ccp(Math.cos(data._a), Math.sin(data._a));
+		this.bodies.getChild(car.childId).ApplyForce(geo.ccpMult(forceUnit, ccp(-100,-100)), data._l);
+		
+		var cast = this.rayCaster.RayCastOneAngular(data._l, d, data._a, [car]);
+		if (cast) {
+			var hit = ccp(data._l.x + d * Math.cos(data._a) * cast.fraction,
+					      data._l.y + d * Math.sin(data._a) * cast.fraction);
+			
+			var damage = 10;
+			
+			if (cast.body.childId) {
+				var el = this.field.getChild(cast.body.childId);
+				
+				damage = 50 * (1 - cast.fraction);
+				
+				
+				// if it's a dynamic hitable element
+				if (el && el.mounts) {
+					cast.body.ApplyForce(geo.ccpMult(forceUnit, ccp(damage,damage)), hit);
+				}
+			}
+			
+			this.events.fire({type: 'update', 
+				actions: [{_t: 'hit', 
+						   _l: hit,
+						   _a: Math.random() * Math.PI * 2,
+						   damage: damage},
+						 ]});
+		} else {
+			this.events.fire({type: 'update', 
+				actions: [{_t: 'hitSound', 
+						   _l: data._l}
+						 ]});
+		}
 	}
 });
 

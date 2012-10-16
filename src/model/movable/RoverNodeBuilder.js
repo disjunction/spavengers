@@ -16,26 +16,15 @@ RoverNodeBuilder.inherit(Object, {
 	 */
 	makeNode: function(rover) {
 		var mnb = this.mountNodeBuilder;
-		
-		/*
-		var nf = this.nodeFactory;
-		var carSprite = nf.makeSprite({file: '/resources/sprites/rovers/hull/car1.png'});
-	    carSprite.position = ccp(0,0);
-	    
-	    
-	    var cannonSprite = nf.makeSprite({file: '/resources/sprites/rovers/weapon/heavy_cannon.png'});
-	    cannonSprite.anchorPoint = ccp(0.5, 0.5); 
-	    cannonSprite.position = ccp(0,0);
-	    */
-	    
+
 	    var node = this.mountNodeBuilder.nodeFactory.makeNode();
 	    
 	    node.addChild(mnb.makeNode(rover.mounts.hull));
 	    
-	    if (rover.mounts.primary) {
-	    	node.addChild(mnb.makeNode(rover.mounts.primary));
-	    }
-	    	
+	    rover.mounts.secondary && node.addChild(mnb.makeNode(rover.mounts.secondary));
+	    rover.mounts.primary && node.addChild(mnb.makeNode(rover.mounts.primary));
+	    
+	    
 	    node.position = geo.ccpMult(rover.location, ccp(config.ppm, config.ppm));
 	    node.rotation = geo.radiansToDegrees(-rover.angle);
 	    
