@@ -1,0 +1,20 @@
+{
+	"_defaults": {
+		"isBody": true,
+		"isNode": true
+	},
+	
+	
+	
+	"car1": {
+		"size": {"width":  2.27, "height" : 1.16},
+		"spriteFile": "/resources/sprites/rovers/hull/car1.png",
+		"primary": {"x": -0.5, "y": 0},
+		"secondary": {"x": 0.3, "y": 0}
+	},
+	"bobik": {
+		"size": {"width":  1.7, "height" : 0.97},
+		"spriteFile": "/resources/sprites/rovers/hull/bobik.png",
+		"primary": {"x": -2.5, "y": 0} 
+	}
+}

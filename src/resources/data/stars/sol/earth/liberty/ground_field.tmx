@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="20" tilewidth="504" tileheight="504">
+ <tileset firstgid="1" name="ground_textures_1008x504" tilewidth="504" tileheight="504">
+  <image source="../../../../../sprites/surface/tileset/ground_textures_1008x504.png" width="1008" height="504"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="20" height="20">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA72T0RIAEAgEy/9/tHcTbeIebsiMraPczPyTRkMnZrSP4uxcwSO+FLzOX+x4JAfxqOKRXK945M7r2aB9TWtU8rq+s/robFd560o9desj73vTN1VNmnhChkAGAAA=
+  </data>
+ </layer>
+</map>

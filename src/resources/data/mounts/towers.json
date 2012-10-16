@@ -1,0 +1,15 @@
+{
+	"_defaults": {
+		"isBody": false,
+		"isNode": true,
+		"omega": 1
+	},	
+	
+	"heavy_cannon": {
+		"size": {"width":  1, "height" : 0.5},
+		"spriteFile": "/resources/sprites/rovers/weapon/heavy_cannon.png",
+		"anchorPoint": {"x": 0.2, "y": 0.5},
+		"location": {"x": -1, "y": 0},
+		"omega": 2
+	}
+}
