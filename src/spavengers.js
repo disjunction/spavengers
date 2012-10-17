@@ -38,6 +38,8 @@ function Spavengers () {
     Spavengers.superclass.constructor.call(this);
 
     this.winSize = Director.sharedDirector.winSize;
+
+    this.lastShot = {primary: 0, secondary: 0};
     
     var vlayer = new nodes.Node();
     this.addChild(vlayer);
@@ -71,13 +73,15 @@ function Spavengers () {
         reconnect: false
     });
     this.socket.on('carInfo', function (data) {
+    	me.hud.showMessage("");
     	me.car = me.fc.field.getChild(data.childId);
+    	me.fieldUpdater = new FieldUpdater(me.fc, me.car);
     });
     this.socket.on('addCar', function (data) {
     	me.fc.addCar(jsein.parse(data.carStr));
     });
     this.socket.on('removeChild', function (data) {
-    	me.fc.removeChildId(data.childId);
+    	me.fc.removeChildId(data.childId, 2);
     });
     this.socket.on('field', function (data) {
     	me.field = jsein.parse(data.fieldStr);
@@ -85,11 +89,9 @@ function Spavengers () {
     		nf = new NodeFactory(),
     	    animator = new Animator(vlayer, nf);
     	me.fc = new FieldClient(me.field, nf, animator, player);
-    	me.fieldUpdater = new FieldUpdater(me.fc);
     	me.fc.attachNodes(vlayer);
     });
     this.socket.on('updatePack', function (data) {
-    	me.hud.showMessage("");
     	me.fc.updatePack = data.updatePack;
     	me.fc.updated = true;
     	me.hud.feedSps();
@@ -99,7 +101,6 @@ function Spavengers () {
     	me.hud.showMessage("initializing...");
     });
     this.socket.on('update', function (data) {
-    	console.log(data);
     	me.fieldUpdater.update(data);
     });
     this.socket.on('disconnect', function (data) {
@@ -117,8 +118,8 @@ Spavengers.inherit(Layer, {
 		return ccp(mx, my);
 	},
 	update: function(dt) {
-		if (this.fc) {
-			this.fc.update();
+		if (this.fc && this.fieldUpdater) {
+			this.fieldUpdater.checkUpdatePack();
 		}
 
 		this.hud.feedFps();
@@ -128,12 +129,17 @@ Spavengers.inherit(Layer, {
 		}
 		
     	if (this.mouseEvent) {
-	    	var lastOmega = jsein.clone(this.towerOmega);
-	    	
 	    	this.towerOmega = this.fc.getTowerOmega(this.mouseEventToLocation(this.mouseEvent), this.car);
 	    	
-	    	if (this.towerOmega.primary != lastOmega.primary || this.towerOmega.secondary != lastOmega.secondary) {
-	    		this.socket.emit('towerOmega', this.towerOmega);
+	    	if (this.towerOmega.primary != 0 || this.towerOmega.secondary != 0) {
+	    		var angles = {};
+				for (var j in this.towerOmega) {
+					if (this.towerOmega[j] != 0 && typeof this.car.mounts[j] != 'undefined') {
+						this.car.mounts[j].angle += this.towerOmega[j] * dt;
+						angles[j] = this.car.mounts[j].angle;
+					}
+				}
+	    		this.socket.emit('towerRotor', {omega: this.towerOmega, angles: angles});
 	    	}
 		}
 	},
@@ -143,10 +149,16 @@ Spavengers.inherit(Layer, {
     },
     mouseDown: function(evt){
     	if (this.mouseMode == 'crosshair') {
+    		mountName = (evt.button == 2)? 'secondary' : 'primary';
+        	if (new Date().getTime() - this.lastShot[mountName] < 500) return;
+        	
+        	this.lastShot[mountName] = new Date().getTime();
+    		
+    		this.fc.shootMount(this.car, this.car.mounts[mountName]);
     		this.socket.emit('shootMount', 
-    				{mountName: 'primary', 
-    			     _l: this.car.mounts.primary.getAbsLocation(this.car), 
-    			     _a: this.car.angle + this.car.mounts.primary.angle
+    				{mountName: mountName, 
+    			     _l: this.car.mounts[mountName].getAbsLocation(this.car), 
+    			     _a: this.car.angle + this.car.mounts[mountName].angle
     		});
     	}
     },
@@ -173,7 +185,7 @@ Spavengers.inherit(Layer, {
     				this.socket.emit('thrust', -50);
     				break;
     			default:
-    				console.log('key: ' + evt.keyCode);
+    				//console.log('key: ' + evt.keyCode);
     		}
     	},
 	keyUp: function(evt) {

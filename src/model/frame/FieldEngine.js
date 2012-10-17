@@ -34,6 +34,9 @@ function round3(x) {
 }
 
 FieldEngine.inherit(Object, {
+	/**
+	 * @todo move to a separate class FieldFactoryXxx
+	 */
 	makeWorld: function() {
 	    var world = new box2d.b2World(new box2d.b2Vec2(0, 0), true);	    
 	    var jsonSrc = require('../../resources/data/stars/sol/earth/liberty/field.json');
@@ -148,6 +151,13 @@ FieldEngine.inherit(Object, {
 		
 		this.field._fullUpdatePack = null;
 	},
+	
+	applyTowerRotor: function(car, rotor) {
+		for (var i in rotor.angles) {
+			car.mounts[i].angle = rotor.angles[i];
+		}
+		this.bodies.getChild(car.childId).SetAwake(true);
+	},
 	stepField: function() {
 		if (!this.oldTime) this.oldTime = (new Date()).getTime();
 		var newTime = (new Date()).getTime();
@@ -162,7 +172,9 @@ FieldEngine.inherit(Object, {
 			if (car != null && thrust != null && thrust !=0) {
 				carBody.ApplyForce(geo.ccpMult(car.front, ccp(thrust, thrust)), car.rearPoint);
 			}
-			if (car.towerOmega) {
+			// see applyTowerRotor
+			/*
+			if (0 && car.towerOmega) {
 				for (var j in car.towerOmega) {
 					if (car.mounts[j] && car.towerOmega[j] != 0) {
 						car.mounts[j].angle += car.towerOmega[j] * (newTime - this.oldTime) / 1000;
@@ -170,6 +182,7 @@ FieldEngine.inherit(Object, {
 					}
 				}
 			}
+			*/
 		}
 		
 		this.world.Step((newTime - this.oldTime)/1000, 10, 10);
@@ -178,9 +191,14 @@ FieldEngine.inherit(Object, {
 		this.updateField();
 		this.oldTime = newTime;
 	},
+	
 	addCar: function() {
-		
-		var car = this.roverFactory.makeRover({hull: 'car1', primary: 'heavy_cannon'});
+		var car;
+		if (Math.random() < 0.5) {
+			car = this.roverFactory.makeRover({hull: 'car1', primary: 'heavy_cannon'});
+		} else {
+			car = this.roverFactory.makeRover({hull: 'firetruck', primary: 'heavy_cannon', secondary: 'heavy_cannon'});
+		}
 	    car.location = ccp(3,3);
 	    car.angle = 0;
 	    
@@ -196,6 +214,7 @@ FieldEngine.inherit(Object, {
 	    
 	    return car;
 	},
+	
 	removeCar: function(car) {
 		this.world.DestroyBody(this.carBodies.getChild(car.childId));
 		this.carBodies.removeChildId(car.childId);
@@ -213,7 +232,13 @@ FieldEngine.inherit(Object, {
 		var forceUnit = ccp(Math.cos(data._a), Math.sin(data._a));
 		this.bodies.getChild(car.childId).ApplyForce(geo.ccpMult(forceUnit, ccp(-100,-100)), data._l);
 		
-		var cast = this.rayCaster.RayCastOneAngular(data._l, d, data._a, [car]);
+		var cast = this.rayCaster.RayCastOneAngular(data._l, d, data._a, [car.childId]);
+		
+		var actions = [{_t: 'shoot',
+					   mountName: data.mountName,
+					   _l: data._l,
+					   childId: car.childId}];
+		
 		if (cast) {
 			var hit = ccp(data._l.x + d * Math.cos(data._a) * cast.fraction,
 					      data._l.y + d * Math.sin(data._a) * cast.fraction);
@@ -225,25 +250,20 @@ FieldEngine.inherit(Object, {
 				
 				damage = 50 * (1 - cast.fraction);
 				
-				
 				// if it's a dynamic hitable element
 				if (el && el.mounts) {
 					cast.body.ApplyForce(geo.ccpMult(forceUnit, ccp(damage,damage)), hit);
 				}
 			}
 			
-			this.events.fire({type: 'update', 
-				actions: [{_t: 'hit', 
-						   _l: hit,
-						   _a: Math.random() * Math.PI * 2,
-						   damage: damage},
-						 ]});
-		} else {
-			this.events.fire({type: 'update', 
-				actions: [{_t: 'hitSound', 
-						   _l: data._l}
-						 ]});
+			actions.push({_t: 'hit', 
+						 _l: hit,
+						 _a: Math.random() * Math.PI * 2,
+						 damage: damage,
+						 childId: cast.body.childId});
 		}
+		
+		this.events.fire({type: 'update', actions: actions});
 	}
 });
 

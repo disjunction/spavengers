@@ -9,17 +9,22 @@ var
 
 function FieldClient(field, nodeFactory, animator, player) {
 	var pl = new jsaaa.Playlist(player);
+	var bu = config.resources.baseUrl;
 	
+	/*
 	for (var i = 1; i <= 5; i++) {
-		player.createSound({id: 'mus' + i, url: 'http://spavengers.local/music/space1_0' + i + '.ogg'});
+		player.createSound({id: 'mus' + i, url: bu + '/music/space1_0' + i + '.ogg'});
 		pl.push('mus' + i);
 	}
+	*/
 	
-	var music = new Audio('http://spavengers.local/music/space1.ogg');
+	var music = new Audio(bu + '/music/space1.ogg');
+	music.autoplay = true;
 	music.loop = true;
 	music.play();
 	
-	player.createSound({id: 'hit1', url: 'http://spavengers.local/sounds/explosion-02.ogg'});
+	player.createSound({id: 'hit1', url: bu + '/sounds/explosion-02.ogg'});
+	player.createSound({id: 'heavy_cannon_shot', url: bu + '/sounds/heavy_cannon_shot.ogg'});
 	this.player = player;
 	
 	FieldClient.superclass.constructor.call(this);
@@ -68,7 +73,6 @@ FieldClient.inherit(Object, {
 			    		ch.angle = el.a;
 			    		if (el.ta) {
 			    			ch.mounts.primary.angle = el.ta[0];
-			    			//console.log(ch.mounts.primary);
 			    			if (el.ta.length > 1) ch.mounts.secondary.angle = el.ta[1];
 			    		}
 	    			}
@@ -82,16 +86,15 @@ FieldClient.inherit(Object, {
 	 * @returns {primary: ..., secondary: ...}
 	 */
 	getTowerOmega: function(ml, car) {
-		var approx = geo.ccpDistance(car.location, ml);
-		
-		if (approx < 1) return {primary: 0, secondary: 0};
+		//var approx = geo.ccpDistance(car.location, ml);
+		//if (approx < 01) return {primary: 0, secondary: 0};
 		
 		function getO(mount) {
 			 if (!mount) return 0;
 			 var mountL = mount.getAbsLocation(car);
 			 var mouseAngle = geo.floorAngle(Math.atan2(ml.y - mountL.y, ml.x - mountL.x));
 			 var mountAngle = geo.floorAngle(car.angle + mount.angle);
-			 if (Math.abs(mouseAngle - mountAngle) < 0.1) return 0;
+			 if (Math.abs(mouseAngle - mountAngle) < 0.05) return 0;
 			 
 			 var a1 = mountAngle, a2 = mouseAngle;
 			 
@@ -108,9 +111,26 @@ FieldClient.inherit(Object, {
 		this.rovers.push(car);
 		this.roverNodeBuilder.attachNode(car, this.layer);
 	},
-	removeChildId: function(childId) {
-		console.log(this.field.getChild(childId).node);
-		this.layer.removeChild(this.field.getChild(childId).node);
+	/**
+	 * @param childId
+	 * @param int dur - fadeout duration
+	 */
+	removeChildId: function(childId, dur) {
+		// kind of typecast for undefined :\
+		if (!dur) dur = 0;
+		
+		var child = this.field.getChild(childId);
+		
+		// if child is composed out of mounts
+		// then we need to fade out each of them
+		if (child.mounts) {
+			for (var i in child.mounts)
+				if (child.mounts[i].node)
+					this.animator.fadeOutRemove(child.mounts[i].node, 0, dur);	
+		} else {
+			// unknown child is removed, let's try to fade it out
+			child.node && this.animator.fadeOutRemove(child.node, 0, dur);
+		}
 		this.field.removeChildId(childId);
 	},
 	playHit: function(action) {
@@ -118,16 +138,25 @@ FieldClient.inherit(Object, {
 	},
 	showHit: function(action) {
 		var opts = {
-				scale: Math.min(0.2, action.damage * 0.01),
+				scale: Math.max(0.1, Math.min(0.2, action.damage * 0.01)),
 				_l: action._l,
 				_a: action._a,
 				opacity: 200,
 				file: '/resources/sprites/particles/explosions/exp1.png'
 		};
 		
-		this.animator.showSpriteAndFadeOut(opts, 0.2, 0.3);
+		this.animator.showSpriteAndFadeOutRemove(opts, 0.2, 0.3);
 		this.playHit(action);
+	},
+	shootMount: function(car, mount) {
+		if (!mount) return;
+		if (mount.node) {
+			this.animator.backAndForth(mount.node, 0.2, 0.05, 0.15);
+		}
+		var soundName = mount.name + '_shot';
+		this.player.play(soundName);
 	}
+	
 });
 
 module.exports = FieldClient;

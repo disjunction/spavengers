@@ -9,6 +9,7 @@ var AudioMock = function(url) {
 	
 	this.play = function(){};
 	this.pause = function(){};
+	this.load = function(){};
 };
 
 var AudioFactoryMock = function(){};

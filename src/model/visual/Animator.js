@@ -4,11 +4,14 @@ var
 	actions = cocos2d.actions,
     geo    = require('geometry'),
     ccp    = geo.ccp,
+    config = require('../abstract/Config'),
     actions = cocos2d.actions;
 
 /**
- * The goal of this factory is to make it mockable,
- * so that full with the nodes and scenes can be tested in console
+ * factory is here more for the consistency
+ * 
+ * the class depends on cocos2d.actions anyway :\
+ * 
  * @param Layer layer
  * @param NodeFactory nodeFactory
  */
@@ -17,18 +20,35 @@ function Animator(layer, nodeFactory) {
 	this.nodeFactory = nodeFactory;
 }
 
-Animator.prototype.showSpriteAndFadeOut = function(spriteOpts, dur1, dur2) {
+Animator.prototype.showSpriteAndFadeOutRemove = function(spriteOpts, dur1, dur2) {
 	var sprite = this.nodeFactory.makeSprite(spriteOpts);
 	this.layer.addChild(sprite);
+	this.fadeOutRemove(sprite, dur1, dur2);
+};
+
+Animator.prototype.fadeOutRemove = function(node, dur1, dur2) {
 	var sequence = new actions.Sequence({actions: [
 	    new actions.DelayTime({duration: dur1}),
 		new actions.FadeTo({duration: dur2, toOpacity: 0})
 	]});
 	
-	sprite.runAction(sequence);
+	node.runAction(sequence);
 	setTimeout(function remove() {
-		this.layer.removeChild(sprite);
+		this.layer.removeChild(node);
 	}.bind(this), (dur1+dur2) * 1000);
 };
+
+Animator.prototype.backAndForth = function(node, distance, backDur, forthDur) {
+	var shift = ccp(distance * Math.cos(geo.degreesToRadians(node.rotation)) * config.ppm,
+					distance * -Math.sin(geo.degreesToRadians(node.rotation)) * config.ppm);
+	var pos = ccp(node.position.x,node.position.y);
+	var sequence = new actions.Sequence({actions: [
+	    new actions.MoveBy({duration: backDur, position: geo.ccpNeg(shift)}),
+		new actions.MoveBy({duration: forthDur, position: shift}),
+		new actions.MoveTo({duration: 0, position: pos})
+	]});
+	node.runAction(sequence);
+};
+
 
 module.exports = Animator;

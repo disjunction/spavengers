@@ -16,5 +16,11 @@
 		"size": {"width":  1.7, "height" : 0.97},
 		"spriteFile": "/resources/sprites/rovers/hull/bobik.png",
 		"primary": {"x": -2.5, "y": 0} 
+	},
+	"firetruck": {
+		"size": {"width":  4.36, "height" : 1.47},
+		"spriteFile": "/resources/sprites/rovers/hull/firetruck.png",
+		"secondary": {"x": -1.5, "y": 0},
+		"primary": {"x": 1.2, "y": 0}
 	}
 }

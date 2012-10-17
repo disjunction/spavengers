@@ -33,10 +33,14 @@ SoundPlayer.prototype.createSound = function(opts) {
 };
 
 SoundPlayer.prototype.play = function(id) {
+	if (!this.registry[id]) {
+		console.log('sound ' + id + ' not registered');
+		return;
+	}
 	if (this.registry[id].audio.ended) {
 		this.registry[id].audio.play();
 	} else {
-		var a = new Audio(this.registry[id].url);
+		var a = this.af.makeAudio(this.registry[id].url);
 		a.play();
 	}
 };

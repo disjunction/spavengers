@@ -77,8 +77,8 @@ function main() {
 			 car.torque = data;
 		 });
 		 
-		 socket.on('towerOmega', function (data) {
-			 car.towerOmega = data;
+		 socket.on('towerRotor', function (data) {
+			 fieldEngine.applyTowerRotor(car, data);
 		 });
 		 
 		 // data: {mountName: ..., _l: ..., _a: ...}

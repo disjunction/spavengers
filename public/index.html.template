@@ -31,9 +31,8 @@
 			}
         </style>
     </head>
-    <body>
+    <body oncontextmenu="return false;">
     <script src="http://spavengers.local:9600/socket.io/socket.io.js"></script>
-        <h1>Spavengers</h1>
         <div class="cocos2d-app">
             Loading Spavengers...
             ${scripts}
