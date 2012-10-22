@@ -30,11 +30,23 @@ geo.ccpRotateByAngle = function(v, pivot, angle) {
 	return r;
 };
 
+geo.ccpNormalize = function(v) {
+	return geo.ccpMult(v, 1/geo.ccpLength(v));
+};
+
+geo.ccpForAngle = function(a) {
+	return geo.ccp(Math.cos(a), Math.sin(a));
+};
+
+
+
+
 /////// ADDITIONAL (non-cocos2d extensions)
 
 geo.ccp2Angle = function(point) {
 	return Math.atan2(point.y, point.x);
-}
+};
+
 
 /**
  * converts any angle to [-pi; pi]

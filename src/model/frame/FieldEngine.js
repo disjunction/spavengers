@@ -10,6 +10,7 @@ var
   , RoverFactory = require('../movable/RoverFactory')
   , RoverBodyBuilder = require('../movable/RoverBodyBuilder')
   , RoverNodeBuilder = require('../movable/RoverNodeBuilder')
+  , RoverEngine = require('../movable/RoverEngine')
   , Rover    = require('../movable/Rover')
   
   , SurfaceDescriptor    = require('../surface/SurfaceDescriptor')
@@ -123,9 +124,9 @@ FieldEngine.inherit(Object, {
 	    this.carBodies = new Parent();
 	    
 	    this.field = field;
-	    this.speed = this.torque = 0;
 	    this.world = world;
 	    this.rayCaster = new RayCaster(world);
+	    this.roverEngine = new RoverEngine(field);
 	},
 	updateField: function() {
 		for (var i in this.npcs.children) {
@@ -161,28 +162,21 @@ FieldEngine.inherit(Object, {
 	stepField: function() {
 		if (!this.oldTime) this.oldTime = (new Date()).getTime();
 		var newTime = (new Date()).getTime();
-				
+
 		for (var i in this.cars.children) {
 			var car = this.cars.children[i];
 			var carBody  = this.carBodies.children[i];
-			if (car != null && car.torque != null && car.torque !=0) {
-				carBody.ApplyTorque(car.torque);
-			}
+
 			var thrust = car.thrust;
 			if (car != null && thrust != null && thrust !=0) {
-				carBody.ApplyForce(geo.ccpMult(car.front, ccp(thrust, thrust)), car.rearPoint);
-			}
-			// see applyTowerRotor
-			/*
-			if (0 && car.towerOmega) {
-				for (var j in car.towerOmega) {
-					if (car.mounts[j] && car.towerOmega[j] != 0) {
-						car.mounts[j].angle += car.towerOmega[j] * (newTime - this.oldTime) / 1000;
-						carBody.SetAwake(true);
-					}
+				if (thrust > 0) {
+					this.roverEngine.applyThrust(carBody, car);
+				} else {
+					this.roverEngine.applyBreak(carBody, car);
 				}
 			}
-			*/
+
+			this.roverEngine.applyResistence(carBody, car);
 		}
 		
 		this.world.Step((newTime - this.oldTime)/1000, 10, 10);
@@ -194,10 +188,25 @@ FieldEngine.inherit(Object, {
 	
 	addCar: function() {
 		var car;
-		if (Math.random() < 0.5) {
-			car = this.roverFactory.makeRover({hull: 'car1', primary: 'heavy_cannon'});
+		if (Math.random() < 0) {
+			car = this.roverFactory.makeRover({
+				hull: 'car1', 
+				primary: 'heavy_cannon', 
+				
+				rearEngine: 'electro2',
+				rearCarrier: 'wheel',
+				
+				//frontEngine: 'electro3',
+				frontCarrier: 'steering_wheel'
+			});
 		} else {
-			car = this.roverFactory.makeRover({hull: 'firetruck', primary: 'heavy_cannon', secondary: 'heavy_cannon'});
+			car = this.roverFactory.makeRover({
+				hull: 'firetruck', 
+				primary: 'heavy_cannon', 
+				secondary: 'laser_cannon',
+				frontCarrier: 'steering_wheel',
+				rearCarrier: 'wheel',
+				rearEngine: 'electro4'});
 		}
 	    car.location = ccp(3,3);
 	    car.angle = 0;
@@ -227,17 +236,21 @@ FieldEngine.inherit(Object, {
 	 * @param object opts {mountName: ..., _l: location, _a: angle} 
 	 */
 	shootMount: function(car, data) {
-		var d = 7;
+		var d = 7,
+			forceUnit = ccp(Math.cos(data._a), Math.sin(data._a)),
+			mount = this.field.getChild(car.childId).mounts[data.mountName];
 		
-		var forceUnit = ccp(Math.cos(data._a), Math.sin(data._a));
-		this.bodies.getChild(car.childId).ApplyForce(geo.ccpMult(forceUnit, ccp(-100,-100)), data._l);
+		if (mount.recoil > 0) { 
+			this.bodies.getChild(car.childId).ApplyForce(geo.ccpMult(forceUnit, 
+					ccp(-mount.recoil,-mount.recoil)), data._l);
+		}
 		
 		var cast = this.rayCaster.RayCastOneAngular(data._l, d, data._a, [car.childId]);
 		
-		var actions = [{_t: 'shoot',
+		var actions = [{_t: 'shot',
 					   mountName: data.mountName,
 					   _l: data._l,
-					   childId: car.childId}];
+					   subjChildId: car.childId}];
 		
 		if (cast) {
 			var hit = ccp(data._l.x + d * Math.cos(data._a) * cast.fraction,
@@ -260,7 +273,9 @@ FieldEngine.inherit(Object, {
 						 _l: hit,
 						 _a: Math.random() * Math.PI * 2,
 						 damage: damage,
-						 childId: cast.body.childId});
+						 subjChildId: car.childId,
+						 mountName: data.mountName,
+						 objChildId: cast.body.childId});
 		}
 		
 		this.events.fire({type: 'update', actions: actions});

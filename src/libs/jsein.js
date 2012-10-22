@@ -140,4 +140,45 @@ jsein.stringify = function(obj, reviver) {
 	return JSON.stringify(jsein.cloneWithTypes(obj), reviver);
 };
 
+/**
+ * loads a json file supporting default extension for 1st level objects
+ */
+function JsonRepo() {
+    this.defs = {};
+}
+
+JsonRepo.prototype.loadObject = function(o) {
+	var defaults = o._defaults? o._defaults : {};
+	for (var i in o) {
+		if (i.substr(0, 1) == '_') continue;
+		this.defs[i] = jsein.clone(defaults);
+		for (var j in o[i])
+			this.defs[i][j] = o[i][j];
+	}
+};
+
+JsonRepo.prototype.loadFile = function(fileName) {
+	var o = require(fileName);
+	this.loadObject(o);
+};
+
+JsonRepo.prototype.get = function(name) {
+	if (!this.defs[name]) {
+		console.log('JsonRepo cannot find key ' + name);
+	}
+	return this.defs[name];
+};
+
+jsein.JsonRepo = JsonRepo;
+
+jsein.parseFloat = function (o, defaultValue) {
+	if (o === null || typeof o == 'undefined') {
+		return defaultValue? defaultValue : 0;
+	}
+	if (o instanceof Object) {
+		return o.min + Math.random() * (o.max - o.min);
+	}
+	return o;
+};
+
 module.exports = jsein;

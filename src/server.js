@@ -74,7 +74,12 @@ function main() {
 		 }, 20);
 
 		 socket.on('turn', function (data) {
-			 car.torque = data;
+			 if (car.mounts.rearCarrier) {
+				 car.mounts.rearCarrier.angle = data * car.mounts.rearCarrier.angleFactor;
+			 }
+			 if (car.mounts.frontCarrier) {
+				 car.mounts.frontCarrier.angle = data * car.mounts.frontCarrier.angleFactor;
+			 }
 		 });
 		 
 		 socket.on('towerRotor', function (data) {

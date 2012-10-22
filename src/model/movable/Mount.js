@@ -18,7 +18,15 @@ Mount.inherit(NodeContainer, {
 	 */
 	getAbsLocation: function(car) {
 		return geo.ccpRotateByAngle(geo.ccpAdd(this.location, car.location), car.location, car.angle);
-	} 
+	},
+	/**
+	 * just for consistency...
+	 * @param car
+	 * @returns float
+	 */
+	getAbsAngle: function(car) {
+		return car.angle + this.angle;
+	}
 });
 
 module.exports = Mount;

@@ -2,7 +2,8 @@
 	"_defaults": {
 		"isBody": false,
 		"isNode": true,
-		"omega": 1
+		"omega": 1,
+		"recoil": 0
 	},	
 	
 	"heavy_cannon": {
@@ -10,6 +11,17 @@
 		"spriteFile": "/resources/sprites/rovers/weapon/heavy_cannon.png",
 		"anchorPoint": {"x": 0.2, "y": 0.5},
 		"location": {"x": -1, "y": 0},
-		"omega": 2
+		"omega": 2,
+		"reloadTime": 1200,
+		"mass": 50,
+		"recoil": 50,
+		"weapon": "falconet"
+	},
+	"laser_cannon": {
+		"size": {"width":  1, "height" : 0.5},
+		"spriteFile": "/resources/sprites/rovers/weapon/laser_cannon.png",
+		"omega": 5,
+		"reloadTime": 300,
+		"mass": 7
 	}
 }

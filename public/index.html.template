@@ -32,6 +32,7 @@
         </style>
     </head>
     <body oncontextmenu="return false;">
+    <a href="lobby.html">chill out...</a>
     <script src="http://spavengers.local:9600/socket.io/socket.io.js"></script>
         <div class="cocos2d-app">
             Loading Spavengers...

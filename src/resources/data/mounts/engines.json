@@ -1,0 +1,27 @@
+{
+	"_defaults": {
+		"isBody": false,
+		"isNode": false
+	},
+
+	"electro1": {
+		"type": "electro",
+		"mass": 3,
+		"thrust": 10
+	},
+	"electro2": {
+		"type": "electro",
+		"mass": 7,
+		"thrust": 15
+	},
+	"electro3": {
+		"type": "electro",
+		"mass": 15,
+		"thrust": 35
+	},
+	"electro4": {
+		"type": "electro",
+		"mass": 20,
+		"thrust": 60
+	}
+}

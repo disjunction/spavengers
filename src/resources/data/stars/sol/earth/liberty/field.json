@@ -5,7 +5,7 @@
 	 	"A": {
 	    	"_t": "SurfaceElement",
 	    	"type" : "map",
-	    	"file" : "stars/sol/earth/liberty/ground_field"
+	    	"file" : "stars/sol/earth/liberty/map"
 	    },
 	    "B": {
 	    	"_t": "SurfaceElement",

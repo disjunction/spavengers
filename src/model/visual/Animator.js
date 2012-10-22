@@ -24,7 +24,22 @@ Animator.prototype.showSpriteAndFadeOutRemove = function(spriteOpts, dur1, dur2)
 	var sprite = this.nodeFactory.makeSprite(spriteOpts);
 	this.layer.addChild(sprite);
 	this.fadeOutRemove(sprite, dur1, dur2);
+	if (spriteOpts.rotateBy) {
+		this.rotateBy(sprite, spriteOpts.rotateBy, dur1 + dur2);
+	}
+	if (spriteOpts.scaleBy) {
+		this.scaleBy(sprite, spriteOpts.scaleBy, dur1 + dur2);
+	}
 };
+
+Animator.prototype.rotateBy = function(node, angle, dur) {
+	node.runAction(new actions.RotateBy({duration: dur, angle: geo.radiansToDegrees(angle)}));
+};
+
+Animator.prototype.scaleBy = function(node, scale, dur) {
+	node.runAction(new actions.ScaleBy({duration: dur, scale: scale}));
+};
+
 
 Animator.prototype.fadeOutRemove = function(node, dur1, dur2) {
 	var sequence = new actions.Sequence({actions: [

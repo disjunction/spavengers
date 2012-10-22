@@ -10,17 +10,27 @@
 		"size": {"width":  2.27, "height" : 1.16},
 		"spriteFile": "/resources/sprites/rovers/hull/car1.png",
 		"primary": {"x": -0.5, "y": 0},
-		"secondary": {"x": 0.3, "y": 0}
+		"secondary": {"x": 0.3, "y": 0},
+		"carrier": "wheels",
+		"frontCarrier": {"x": -1.1, "y": 0},
+		"rearCarrier": {"x": 1.1, "y": 0},
+		"mass": 100
 	},
 	"bobik": {
 		"size": {"width":  1.7, "height" : 0.97},
 		"spriteFile": "/resources/sprites/rovers/hull/bobik.png",
-		"primary": {"x": -2.5, "y": 0} 
+		"primary": {"x": -0.3, "y": 0},
+		"carrier": "legs",
+		"mass": 100 
 	},
 	"firetruck": {
 		"size": {"width":  4.36, "height" : 1.47},
 		"spriteFile": "/resources/sprites/rovers/hull/firetruck.png",
 		"secondary": {"x": -1.5, "y": 0},
-		"primary": {"x": 1.2, "y": 0}
+		"primary": {"x": 1.2, "y": 0},
+		"carrier": "wheels",
+		"frontCarrier": {"x": -2.1, "y": 0},
+		"rearCarrier": {"x": 2.1, "y": 0},
+		"mass": 350
 	}
 }

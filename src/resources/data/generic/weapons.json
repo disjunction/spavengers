@@ -1,0 +1,27 @@
+{
+	"falconet": {
+		"range": 7,
+		"recoil": 50,
+		"closeDamage": {"min": 70, "max" : 100},
+		"farDamage": 30,
+		"visual": {
+			"shot": {
+				
+			},
+			"hit": {
+				"rotateBy": {"min": -0.4, "max" : 0.4},
+				"opacity": 200,
+				"scaleBy": 1.4,
+				"sprite": "explosions/exp1.png",
+				"spriteScale": 0.05,
+				"damageScale": 0.0022,
+				"displayTime": 0.2,
+				"fadeOutTime": 0.3
+			}
+		},
+		"sound": {
+			"shot": "falconet_shot",
+			"hit": "falconet_hit"
+		}
+	}
+}

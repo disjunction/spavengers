@@ -92,9 +92,11 @@ function Spavengers () {
     	me.fc.attachNodes(vlayer);
     });
     this.socket.on('updatePack', function (data) {
-    	me.fc.updatePack = data.updatePack;
-    	me.fc.updated = true;
-    	me.hud.feedSps();
+    	if (me.fc) { 
+	    	me.fc.updatePack = data.updatePack;
+	    	me.fc.updated = true;
+	    	me.hud.feedSps();
+    	}
     });
     this.socket.on('helo', function (data) {
         me.scheduleUpdate();
@@ -128,8 +130,8 @@ Spavengers.inherit(Layer, {
 			this.vlayer.position = geo.ccpAdd(geo.ccpNeg(this.car.node.position), ccp(this.winSize.width / 2 ,this.winSize.height / 2));
 		}
 		
-    	if (this.mouseEvent) {
-	    	this.towerOmega = this.fc.getTowerOmega(this.mouseEventToLocation(this.mouseEvent), this.car);
+    	if (this.fc && this.mouseEvent) {
+	    	this.towerOmega = this.fc.getTowerOmega(this.mouseEventToLocation(this.mouseEvent), this.car, dt);
 	    	
 	    	if (this.towerOmega.primary != 0 || this.towerOmega.secondary != 0) {
 	    		var angles = {};
@@ -148,9 +150,9 @@ Spavengers.inherit(Layer, {
     	this.crosshair.position = ccp(evt.locationInCanvas.x, evt.locationInCanvas.y);
     },
     mouseDown: function(evt){
-    	if (this.mouseMode == 'crosshair') {
+    	if (this.mouseMode == 'crosshair' && this.car) {
     		mountName = (evt.button == 2)? 'secondary' : 'primary';
-        	if (new Date().getTime() - this.lastShot[mountName] < 500) return;
+        	if (new Date().getTime() - this.lastShot[mountName] < this.car.mounts[mountName].reloadTime) return;
         	
         	this.lastShot[mountName] = new Date().getTime();
     		
@@ -169,20 +171,19 @@ Spavengers.inherit(Layer, {
     		switch(evt.keyCode) {
     			case 68:
     			case 39:
-    				this.socket.emit('turn', -15);
+    				this.socket.emit('turn', 1);
     				break;
     			case 65:
     			case 37:
-    				this.socket.emit('turn', 15);
-    				this.torque = 15;
+    				this.socket.emit('turn', -1);
     				break;
     			case 87:
     			case 38:
-    				this.socket.emit('thrust', 50);
+    				this.socket.emit('thrust', 1);
     				break;
     			case 83:
     			case 40: 
-    				this.socket.emit('thrust', -50);
+    				this.socket.emit('thrust', -1);
     				break;
     			default:
     				//console.log('key: ' + evt.keyCode);

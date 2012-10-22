@@ -5,6 +5,7 @@ var
     MountNodeBuilder = require('../movable/MountNodeBuilder'),
     SurfaceNodeBuilder = require('../surface/SurfaceNodeBuilder'),
     RoverNodeBuilder = require('../movable/RoverNodeBuilder'),
+    WeaponPlayer = require('../visual/WeaponPlayer'),
     ccp    = geo.ccp;
 
 function FieldClient(field, nodeFactory, animator, player) {
@@ -19,9 +20,9 @@ function FieldClient(field, nodeFactory, animator, player) {
 	*/
 	
 	var music = new Audio(bu + '/music/space1.ogg');
-	music.autoplay = true;
+	music.autoplay = false;
 	music.loop = true;
-	music.play();
+	//music.play();
 	
 	player.createSound({id: 'hit1', url: bu + '/sounds/explosion-02.ogg'});
 	player.createSound({id: 'heavy_cannon_shot', url: bu + '/sounds/heavy_cannon_shot.ogg'});
@@ -31,6 +32,8 @@ function FieldClient(field, nodeFactory, animator, player) {
 	this.field = field;
 	this.nodeFactory = nodeFactory;
 	this.animator = animator;
+	this.weaponPlayer = new WeaponPlayer(field, animator, player, null);
+	
 	this.mountNodeBuilder = new MountNodeBuilder(nodeFactory);
 	this.roverNodeBuilder = new RoverNodeBuilder(this.mountNodeBuilder);
 	this.surfaceNodeBuilder = new SurfaceNodeBuilder(nodeFactory);
@@ -83,9 +86,11 @@ FieldClient.inherit(Object, {
 	},
 	/**
 	 * @param Point ml - mouse location
+	 * @param Rover car - subject car
+	 * @param int dt - expect delta time, used for sticky angle
 	 * @returns {primary: ..., secondary: ...}
 	 */
-	getTowerOmega: function(ml, car) {
+	getTowerOmega: function(ml, car, dt) {
 		//var approx = geo.ccpDistance(car.location, ml);
 		//if (approx < 01) return {primary: 0, secondary: 0};
 		
@@ -94,12 +99,17 @@ FieldClient.inherit(Object, {
 			 var mountL = mount.getAbsLocation(car);
 			 var mouseAngle = geo.floorAngle(Math.atan2(ml.y - mountL.y, ml.x - mountL.x));
 			 var mountAngle = geo.floorAngle(car.angle + mount.angle);
-			 if (Math.abs(mouseAngle - mountAngle) < 0.05) return 0;
+			 if (Math.abs(mouseAngle - mountAngle) < 0.04) return 0;
 			 
 			 var a1 = mountAngle, a2 = mouseAngle;
 			 
 			 if ( a1 < -Math.PI / 2 && a2 > Math.PI / 2 ) a1 += Math.PI * 2;
 			 if ( a1 > Math.PI / 2 && a2 < -Math.PI / 2 ) a1 -= Math.PI * 2;
+			 
+			 // if the next update will step over the target angle...
+			 if (Math.abs(mount.omega * dt) > Math.abs(a2 - a1)) {
+				 return (a2 - a1)/dt;
+			 }
 			 
 			 return a2 > a1? mount.omega : -mount.omega;
 		}
@@ -137,16 +147,7 @@ FieldClient.inherit(Object, {
 		this.player.play('hit1');
 	},
 	showHit: function(action) {
-		var opts = {
-				scale: Math.max(0.1, Math.min(0.2, action.damage * 0.01)),
-				_l: action._l,
-				_a: action._a,
-				opacity: 200,
-				file: '/resources/sprites/particles/explosions/exp1.png'
-		};
-		
-		this.animator.showSpriteAndFadeOutRemove(opts, 0.2, 0.3);
-		this.playHit(action);
+		this.weaponPlayer.playAction(action);
 	},
 	shootMount: function(car, mount) {
 		if (!mount) return;

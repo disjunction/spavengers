@@ -1,0 +1,20 @@
+{
+	"_defaults": {
+		"isBody": false,
+		"isNode": false,
+		"angleFactor":  0
+	},	
+	
+	"wheel": {
+		"mass" : 10
+	},
+	"steering_wheel": {
+		"mass" : 15,
+		"angleFactor":  0.4
+	},
+	"rear_steering_wheel": {
+		"mass" : 20,
+		"steering": true,
+		"angleFactor":  -0.1
+	}
+}

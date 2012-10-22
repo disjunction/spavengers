@@ -103,11 +103,6 @@ exports.testRayCast = function(test) {
     world.Step(1/30, 10, 10);
     
     var cb = function callBack(p1, p2, p3, p4) {
-    	console.log('callback');
-    	console.log(p1);
-    	console.log(p2);
-    	console.log(p3);
-    	console.log(p4);
     	return 1;
     };
     
@@ -127,10 +122,6 @@ exports.testRayCast = function(test) {
 
     var shape = b2.GetFixtureList(); //.GetShape();
         
-    var hit = shape.RayCast(output, input,transform);
-    console.log(transform);
-
-    
-    
+    var hit = shape.RayCast(output, input,transform);    
 	test.done();
 }

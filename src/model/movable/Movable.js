@@ -7,6 +7,7 @@ var
 
 function Movable() {
 	Movable.superclass.constructor.call(this);
+	this.mass = 0.1;
 }
 
 Movable.inherit(NodeContainer, {
@@ -26,6 +27,10 @@ Movable.inherit(NodeContainer, {
 	get rear() {return geo.ccpNeg(this.front);},
 	get frontPoint() { return geo.ccpAdd(this.location, this.front);},
 	get rearPoint() { return geo.ccpAdd(this.location, this.rear);},
+	
+	get density() {
+		return 1;
+	}
 	
 });
 

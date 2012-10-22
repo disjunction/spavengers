@@ -94,3 +94,13 @@ exports.testRecoverArray = function(test) {
 	test.ok(Array.isArray(o.a));
 	test.done();
 };
+
+exports.testParseInt = function(test) {
+	test.equal(1.654, jsein.parseFloat(1.654));
+	
+	var rand = jsein.parseFloat({min: -10, max: 5});
+	test.ok(rand > -10);
+	test.ok(rand < 5);
+	
+	test.done();
+};

@@ -38,10 +38,10 @@ FieldUpdater.prototype.dispatchAction = function(action) {
 		case 'hit':
 			this.fc.showHit(action);
 			break;
-		case 'shoot':
+		case 'shot':
 			console.log(action);
-			if (action.childId != this.car.childId) {
-				var who = this.fc.field.getChild(action.childId);
+			if (action.subjChildId != this.car.childId) {
+				var who = this.fc.field.getChild(action.subjChildId);
 				var mount = who.mounts[action.mountName];
 				this.fc.shootMount(who, mount);
 			}
