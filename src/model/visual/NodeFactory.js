@@ -35,6 +35,11 @@ NodeFactory.inherit(Object, {
 	 * @return Node
 	 */
 	applyOpts: function(node, opts) {
+		
+		if (opts.anchorPoint) {
+			node.anchorPoint = opts.anchorPoint;
+		}
+		
 		for (var i in opts) {
 			switch (i) {
 			case 'rotation':

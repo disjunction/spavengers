@@ -70,9 +70,8 @@ RoverEngine.prototype.applyResistence = function (roverBody, rover) {
 };
 
 RoverEngine.prototype.applyAirResistence = function (roverBody, rover) {
-	return;
 	var vSq = geo.ccpLengthSQ(roverBody.GetLinearVelocity()),
-		resistFactor = ccp(vSq * 0.5, vSq * 0.5);
+		resistFactor = ccp(vSq * 0.01, vSq * 0.01);
 	
 		roverBody.ApplyForce(mult(geo.ccpNeg(roverBody.GetLinearVelocity()), resistFactor),
 							 rover.location);

@@ -36,7 +36,7 @@ exports.testBasicUsage = function(test) {
 		force_x = force.x;
 	
 	// force decreases because of air resistance
-	roverBody.SetLinearVelocity(geo.ccp(2, 2));
+	roverBody.SetLinearVelocity(geo.ccp(20, 2));
 	roverEngine.applyAirResistence(roverBody, car);
 	test.ok(roverBody.m_force.x < force_x);
 	

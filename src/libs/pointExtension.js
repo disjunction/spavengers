@@ -38,7 +38,12 @@ geo.ccpForAngle = function(a) {
 	return geo.ccp(Math.cos(a), Math.sin(a));
 };
 
+/////// OVERRIDEN
 
+geo.ccpMult = function (p1, p2) {
+	if (typeof p2 != 'object') p2 = geo.ccp(p2, p2);
+    return geo.ccp(p1.x * p2.x, p1.y * p2.y);
+},
 
 
 /////// ADDITIONAL (non-cocos2d extensions)
@@ -46,7 +51,6 @@ geo.ccpForAngle = function(a) {
 geo.ccp2Angle = function(point) {
 	return Math.atan2(point.y, point.x);
 };
-
 
 /**
  * converts any angle to [-pi; pi]

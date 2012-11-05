@@ -41,4 +41,12 @@ exports.testRotateByAngle = function(test) {
 	test.done();
 };
 
-
+exports.testCcpMult = function(test) {
+	var point = geo.ccp(3,-5),
+		second = geo.ccpMult(point, 4);
+	
+	test.equal(12, second.x);
+	test.equal(-20, second.y);
+	
+	test.done();
+};

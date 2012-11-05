@@ -15,14 +15,14 @@ function MountFactory () {
 }
 
 MountFactory.inherit(Object, {
-	makeMount: function(name) {
+	makeMount: function(index) {
 		var mount = new Mount(),
-			def = this.jsonRepo.get(name);
+			def = this.jsonRepo.get(index);
 		
 		for (var i in def) {
 			mount[i] = jsein.clone(def[i]);
 		}
-		mount.name = name;
+		mount.index = index;
 		return mount;
 	}
 });

@@ -1,5 +1,6 @@
 var
     geo    = require('../../libs/pointExtension'),
+    UpdateAction = require('../frame/UpdateAction'),
     config = require('../abstract/Config'),
     ccp    = geo.ccp;
 
@@ -28,18 +29,18 @@ FieldUpdater.prototype.checkUpdatePack = function() {
 FieldUpdater.prototype.update = function(data) {
 	if (typeof data.actions == 'object') {
 		for (var i in data.actions) {
-			this.dispatchAction(data.actions[i]);
+			var action = UpdateAction.factory(data.actions[i], this.fc.field);
+			this.dispatchAction(action);
 		}
 	}
 };
 
 FieldUpdater.prototype.dispatchAction = function(action) {
-	switch (action._t) {
+	switch (action.at) {
 		case 'hit':
 			this.fc.showHit(action);
 			break;
 		case 'shot':
-			console.log(action);
 			if (action.subjChildId != this.car.childId) {
 				var who = this.fc.field.getChild(action.subjChildId);
 				var mount = who.mounts[action.mountName];
@@ -49,6 +50,8 @@ FieldUpdater.prototype.dispatchAction = function(action) {
 		case 'ray':
 			this.fc.showRay(action);
 			break;
+		default:
+			throw new Error('unknown action: ' + action.at);
 	}
 };
 

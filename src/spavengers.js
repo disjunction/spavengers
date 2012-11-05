@@ -52,6 +52,10 @@ function Spavengers () {
     this.speed = this.torque = 0;
     this.towerOmega = {primary: 0, secondary: 0};
     
+    this.lastCarPos = null;
+    this.visualShift = ccp(0,0);
+    this.visualSpeed = ccp(0,0);
+    
     this.hud = new RoverHud(this);
     this.hud.showMessage("connecting...");
     
@@ -64,6 +68,8 @@ function Spavengers () {
     var me = this;
     
     var io = window.parent.io;
+    window.parent.spavengers = this;
+    
     if (!io) {
     	me.hud.showMessage("connection failed :(");
     	return;
@@ -90,6 +96,7 @@ function Spavengers () {
     	    animator = new Animator(vlayer, nf);
     	me.fc = new FieldClient(me.field, nf, animator, player);
     	me.fc.attachNodes(vlayer);
+    	me.hud.showMessage("select the rover");
     });
     this.socket.on('updatePack', function (data) {
     	if (me.fc) { 
@@ -103,6 +110,7 @@ function Spavengers () {
     	me.hud.showMessage("initializing...");
     });
     this.socket.on('update', function (data) {
+    	console.log(data);
     	me.fieldUpdater.update(data);
     });
     this.socket.on('disconnect', function (data) {
@@ -114,12 +122,23 @@ function Spavengers () {
 
 // Inherit from cocos.nodes.Layer
 Spavengers.inherit(Layer, {
-	mouseEventToLocation: function(mouseEvent) {
-		var mx = (this.car.node.position.x + mouseEvent.locationInCanvas.x - this.winSize.width/2) / config.ppm,
-		my = (this.car.node.position.y + mouseEvent.locationInCanvas.y - this.winSize.height/2) / config.ppm;
-		return ccp(mx, my);
+	spawn: function(carDef) {
+		this.socket.emit('spawn', carDef);
 	},
-	update: function(dt) {
+	
+	mouseEventToLocation: function(mouseEvent) {
+		if (this.car) {
+			var mx = (this.car.node.position.x + mouseEvent.locationInCanvas.x + this.visualShift.x - this.winSize.width/2) / config.ppm,
+			my = (this.car.node.position.y + mouseEvent.locationInCanvas.y + this.visualShift.y - this.winSize.height/2) / config.ppm;
+			return ccp(mx, my);
+		}
+	},
+	update: function(dt) { 
+		if (this.car) {
+			this.lastCarPos = ccp(this.car.location.x, this.car.location.y);
+		}
+		
+		
 		if (this.fc && this.fieldUpdater) {
 			this.fieldUpdater.checkUpdatePack();
 		}
@@ -127,10 +146,26 @@ Spavengers.inherit(Layer, {
 		this.hud.feedFps();
 
 		if (this.car) {
-			this.vlayer.position = geo.ccpAdd(geo.ccpNeg(this.car.node.position), ccp(this.winSize.width / 2 ,this.winSize.height / 2));
+			function towards(target, current) {
+				if (Math.abs(target - current) < 10 ) return current;
+				if (target > current) {
+					current+=Math.min(5, Math.max(1, Math.abs(target - current)/100));
+				} else if (target < current) {
+					current-=Math.min(5, Math.max(1, Math.abs(target - current)/100));
+				}
+				return current;
+			}
+			
+			var staticPos =  geo.ccpAdd(geo.ccpNeg(this.car.node.position), ccp(this.winSize.width / 2 ,this.winSize.height / 2));
+			this.visualSpeed = ccp((this.car.location.x - this.lastCarPos.x)/dt, (this.car.location.y - this.lastCarPos.y)/dt);
+			
+			var visualTarget = geo.ccpMult(this.visualSpeed, 10);
+			this.visualShift = ccp(towards(visualTarget.x, this.visualShift.x), towards(visualTarget.y, this.visualShift.y));
+			
+			this.vlayer.position = geo.ccpSub(staticPos, this.visualShift);
 		}
 		
-    	if (this.fc && this.mouseEvent) {
+    	if (this.fc && this.mouseEvent && this.car) {
 	    	this.towerOmega = this.fc.getTowerOmega(this.mouseEventToLocation(this.mouseEvent), this.car, dt);
 	    	
 	    	if (this.towerOmega.primary != 0 || this.towerOmega.secondary != 0) {
@@ -168,6 +203,7 @@ Spavengers.inherit(Layer, {
     	//this.vlayer.position = geo.ccpAdd(this.vlayer.position, new geo.Point(evt.deltaX, evt.deltaY));
     } ,
 	keyDown: function(evt) {
+		if (!this.car) return;
     		switch(evt.keyCode) {
     			case 68:
     			case 39:
@@ -190,6 +226,7 @@ Spavengers.inherit(Layer, {
     		}
     	},
 	keyUp: function(evt) {
+		if (!this.car) return
 		switch(evt.keyCode) {
 			case 83:
 			case 87:				

@@ -22,6 +22,7 @@ function Animator(layer, nodeFactory) {
 
 Animator.prototype.showSpriteAndFadeOutRemove = function(spriteOpts, dur1, dur2) {
 	var sprite = this.nodeFactory.makeSprite(spriteOpts);
+	
 	this.layer.addChild(sprite);
 	this.fadeOutRemove(sprite, dur1, dur2);
 	if (spriteOpts.rotateBy) {
@@ -63,6 +64,11 @@ Animator.prototype.backAndForth = function(node, distance, backDur, forthDur) {
 		new actions.MoveTo({duration: 0, position: pos})
 	]});
 	node.runAction(sequence);
+};
+
+Animator.prototype.fadeTo = function(node, opacity, duration) {
+	var action = new actions.FadeTo({toOpacity: opacity, duration: duration});
+	node.runAction(action);
 };
 
 

@@ -120,6 +120,14 @@ FieldClient.inherit(Object, {
 		this.field.addChild(car);
 		this.rovers.push(car);
 		this.roverNodeBuilder.attachNode(car, this.layer);
+
+		if (car.mounts) {
+			for (var i in car.mounts)
+				if (car.mounts[i].node) {
+					car.mounts[i].node.opacity = 100;
+					this.animator.fadeTo(car.mounts[i].node, 255, 2);
+				}
+		}
 	},
 	/**
 	 * @param childId
@@ -143,19 +151,11 @@ FieldClient.inherit(Object, {
 		}
 		this.field.removeChildId(childId);
 	},
-	playHit: function(action) {
-		this.player.play('hit1');
-	},
 	showHit: function(action) {
 		this.weaponPlayer.playAction(action);
 	},
 	shootMount: function(car, mount) {
-		if (!mount) return;
-		if (mount.node) {
-			this.animator.backAndForth(mount.node, 0.2, 0.05, 0.15);
-		}
-		var soundName = mount.name + '_shot';
-		this.player.play(soundName);
+		this.weaponPlayer.shootMount(car, mount);
 	}
 	
 });

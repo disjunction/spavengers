@@ -143,8 +143,11 @@ jsein.stringify = function(obj, reviver) {
 /**
  * loads a json file supporting default extension for 1st level objects
  */
-function JsonRepo() {
-    this.defs = {};
+function JsonRepo(defs) {
+	this.defs = {};
+	if (typeof defs == 'object') {
+		this.loadObject(defs);
+	}
 }
 
 JsonRepo.prototype.loadObject = function(o) {
@@ -164,7 +167,7 @@ JsonRepo.prototype.loadFile = function(fileName) {
 
 JsonRepo.prototype.get = function(name) {
 	if (!this.defs[name]) {
-		console.log('JsonRepo cannot find key ' + name);
+		console.log('JsonRepo cannot find index ' + name);
 	}
 	return this.defs[name];
 };

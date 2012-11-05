@@ -20,7 +20,9 @@ var
   , bc       = require('../../libs/boxedCocos')
   , jsein    = require('../../libs/jsein').registerCtorLocator(require('../infra/ctorLocator'))
   , RayCaster = require('../../libs/RayCaster')
-  , EventDispatcher  = require('../../libs/EventDispatcher');
+  , EventDispatcher  = require('../../libs/EventDispatcher')
+  , weaponDef = require('../../resources/data/generic/weapons')
+  , logger = require('../../libs/nlogger').logger(module);
 
 function FieldEngine() {
     FieldEngine.superclass.constructor.call(this);
@@ -28,6 +30,8 @@ function FieldEngine() {
     this.roverFactory = new RoverFactory(this.mountFactory);
     
     this.events = new EventDispatcher();
+    
+    this.weaponRepo = new jsein.JsonRepo(weaponDef);
 }
 
 function round3(x) {
@@ -186,8 +190,9 @@ FieldEngine.inherit(Object, {
 		this.oldTime = newTime;
 	},
 	
-	addCar: function() {
-		var car;
+	addCar: function(data) {
+		//var car;
+		/*
 		if (Math.random() < 0) {
 			car = this.roverFactory.makeRover({
 				hull: 'car1', 
@@ -208,6 +213,8 @@ FieldEngine.inherit(Object, {
 				rearCarrier: 'wheel',
 				rearEngine: 'electro4'});
 		}
+		*/
+		var car = this.roverFactory.makeRover(data);
 	    car.location = ccp(3,3);
 	    car.angle = 0;
 	    
@@ -236,18 +243,27 @@ FieldEngine.inherit(Object, {
 	 * @param object opts {mountName: ..., _l: location, _a: angle} 
 	 */
 	shootMount: function(car, data) {
-		var d = 7,
-			forceUnit = ccp(Math.cos(data._a), Math.sin(data._a)),
-			mount = this.field.getChild(car.childId).mounts[data.mountName];
+		var forceUnit = ccp(Math.cos(data._a), Math.sin(data._a)),
+			mount = this.field.getChild(car.childId).mounts[data.mountName],
+			weapon = this.weaponRepo.get(mount.weapon);
 		
-		if (mount.recoil > 0) { 
+		if (!weapon) {
+			logger.warn('shooting uknown weapon ' + mount.index);
+			return;
+		}
+		
+		var d = jsein.parseFloat(weapon.range),
+			damage = jsein.parseFloat(weapon.closeDamage),
+			recoil = (mount.recoil)? mount.recoil : jsein.parseFloat(weapon.recoil);
+		
+		if (recoil > 0) { 
 			this.bodies.getChild(car.childId).ApplyForce(geo.ccpMult(forceUnit, 
-					ccp(-mount.recoil,-mount.recoil)), data._l);
+					ccp(-recoil,-recoil)), data._l);
 		}
 		
 		var cast = this.rayCaster.RayCastOneAngular(data._l, d, data._a, [car.childId]);
 		
-		var actions = [{_t: 'shot',
+		var actions = [{at: 'shot', // action type
 					   mountName: data.mountName,
 					   _l: data._l,
 					   subjChildId: car.childId}];
@@ -256,26 +272,34 @@ FieldEngine.inherit(Object, {
 			var hit = ccp(data._l.x + d * Math.cos(data._a) * cast.fraction,
 					      data._l.y + d * Math.sin(data._a) * cast.fraction);
 			
-			var damage = 10;
+			if (cast.fraction < 1) damage *= (1 - cast.fraction);
 			
 			if (cast.body.childId) {
 				var el = this.field.getChild(cast.body.childId);
 				
-				damage = 50 * (1 - cast.fraction);
-				
 				// if it's a dynamic hitable element
 				if (el && el.mounts) {
-					cast.body.ApplyForce(geo.ccpMult(forceUnit, ccp(damage,damage)), hit);
+					var push = damage * jsein.parseFloat(weapon.pushRatio);
+					cast.body.ApplyForce(geo.ccpMult(forceUnit, push), hit);
 				}
 			}
 			
-			actions.push({_t: 'hit', 
+			actions.push({at: 'hit', 
 						 _l: hit,
-						 _a: Math.random() * Math.PI * 2,
+						 _a: Math.atan2(-cast.normal.y, cast.normal.x),
 						 damage: damage,
 						 subjChildId: car.childId,
 						 mountName: data.mountName,
 						 objChildId: cast.body.childId});
+		} else if (weapon.visual.hit) {
+			var hit = ccp(data._l.x + d * Math.cos(data._a),
+				      data._l.y + d * Math.sin(data._a));
+			
+			actions.push({at: 'hit', 
+				 _l: hit,
+				 subjChildId: car.childId,
+				 mountName: data.mountName,
+				 blank: true});
 		}
 		
 		this.events.fire({type: 'update', actions: actions});

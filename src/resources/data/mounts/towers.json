@@ -2,8 +2,7 @@
 	"_defaults": {
 		"isBody": false,
 		"isNode": true,
-		"omega": 1,
-		"recoil": 0
+		"omega": 1
 	},	
 	
 	"heavy_cannon": {
@@ -22,6 +21,7 @@
 		"spriteFile": "/resources/sprites/rovers/weapon/laser_cannon.png",
 		"omega": 5,
 		"reloadTime": 300,
-		"mass": 7
+		"mass": 7,
+		"weapon": "laser"
 	}
 }

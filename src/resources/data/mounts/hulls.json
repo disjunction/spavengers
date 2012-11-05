@@ -14,14 +14,18 @@
 		"carrier": "wheels",
 		"frontCarrier": {"x": -1.1, "y": 0},
 		"rearCarrier": {"x": 1.1, "y": 0},
-		"mass": 100
+		"mass": 150
 	},
 	"bobik": {
 		"size": {"width":  1.7, "height" : 0.97},
 		"spriteFile": "/resources/sprites/rovers/hull/bobik.png",
 		"primary": {"x": -0.3, "y": 0},
-		"carrier": "legs",
-		"mass": 100 
+		"carrier": "wheels",
+		"mass": 100,
+		"primary": {"x": 0.5, "y": 0},
+		"secondary": {"x": -0.5, "y": 0},
+		"frontCarrier": {"x": -0.8, "y": 0},
+		"rearCarrier": {"x": 0.8, "y": 0}
 	},
 	"firetruck": {
 		"size": {"width":  4.36, "height" : 1.47},
@@ -31,6 +35,6 @@
 		"carrier": "wheels",
 		"frontCarrier": {"x": -2.1, "y": 0},
 		"rearCarrier": {"x": 2.1, "y": 0},
-		"mass": 350
+		"mass": 600
 	}
 }

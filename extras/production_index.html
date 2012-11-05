@@ -15,27 +15,67 @@
                 text-shadow: 0 2px 1px #fff;
             }
             .cocos2d-app {
+            	float: left;
                 border: 1px solid #000;
-                width: 600px;
+                width: 650px;
                 height: 600px;
                 display: block;
-                margin: 0 auto;
+                margin: 0 0;
                 cursor: none;
                 -webkit-box-shadow: 0 3px 10px rgba(0, 0, 0, 0.75);
                 -moz-box-shadow:    0 3px 10px rgba(0, 0, 0, 0.75);
                 -o-box-shadow:      0 3px 10px rgba(0, 0, 0, 0.75);
                 box-shadow:         0 3px 10px rgba(0, 0, 0, 0.75);
             }
+            .spawnForm {
+            	margin: 0 0 0 670px;
+            }
             * {
 			    -webkit-user-select: none; 
 			}
         </style>
+        <script>
+        	function spawn() {
+        		var form = document.getElementById('spawnForm');
+        		var carDef = {
+        			hull: form.elements.hull.value,
+        			frontCarrier: form.elements.frontCarrier.value,
+        			rearCarrier: form.elements.rearCarrier.value,
+        			frontEngine: form.elements.frontEngine.value,
+        			rearEngine: form.elements.rearEngine.value,
+        			primary: form.elements.primary.value,
+        			secondary: form.elements.secondary.value
+        		}
+				spavengers.spawn(carDef);
+				form.style.visibility = 'hidden';
+				document.getElementById('controls').style.visibility = 'visible';
+        	}
+        </script>
     </head>
     <body oncontextmenu="return false;">
+    <!-- <a href="lobby.html">chill out...</a> -->
     <script src="http://spavengers.pluseq.com:9600/socket.io/socket.io.js"></script>
         <div class="cocos2d-app">
-            Loading Spavengers...
+            loading loader :) ...
             ${scripts}
         </div>
+        <div class="spawnForm">
+        	<form id="spawnForm">
+        	hull: <select name="hull"><option>firetruck</option><option>car1</option><option>bobik</option></select><br>
+        	front axle: <select name="frontCarrier"><option>steering_wheel</option><option>wheel</option></select><br>
+        	rear axle: <select name="rearCarrier"><option>wheel</option><option>rear_steering_wheel</option></select><br>
+        	front engine: <select name="frontEngine"><option></option><option>electro1</option><option>electro2</option><option>electro3</option><option>electro4</option></select><br>
+        	rear engine: <select name="rearEngine"><option></option><option>electro1</option><option selected="selected">electro2</option><option>electro3</option><option>electro4</option></select><br>        	
+        	primary tower: <select name="primary"><option></option><option>heavy_cannon</option><option selected="selected">laser_cannon</option></select><br>
+        	secondary tower: <select name="secondary"><option></option><option selected="selected">heavy_cannon</option><option>laser_cannon</option></select><br>
+        	<input type="button" onclick="spawn()" value="Spawn Rover!" />
+        	</form>
+        </div>
+        <div id="controls" style="visibility:hidden">
+        	Movement: W,A,S,D<br/>
+        	Fire: LMB, RMB<br/>
+        	Change rover: F5 :) 
+        </div>
+        
     </body>
 </html>

@@ -1,7 +1,8 @@
 {
 	"falconet": {
-		"range": 7,
+		"range": 10,
 		"recoil": 50,
+		"pushRatio": 1, 
 		"closeDamage": {"min": 70, "max" : 100},
 		"farDamage": 30,
 		"visual": {
@@ -21,6 +22,41 @@
 		},
 		"sound": {
 			"shot": "falconet_shot",
+			"hit": "falconet_hit"
+		}
+	},
+	
+	"laser": {
+		"range": 8,
+		"recoil": 0,
+		"pushRatio": 0,
+		"closeDamage": {"min": 70, "max" : 100},
+		"farDamage": 30,
+		"visual": {
+			"shot": {
+
+			},
+			"hit": {
+				"opacity": 200,
+				"scaleBy": 0.1,
+				"sprite": "explosions/laser_hit.png",
+				"anchorPoint": {"x": 0.1, "y": 0.5},
+				"spriteScale": 1.5,
+				"damageScale": 0.01,
+				"displayTime": 0.2,
+				"fadeOutTime": 0.7,
+				"ray": {
+					"opacity": 250,
+					"sprite": "rays/violet_laser.png",
+					"anchorPoint": {"x": 0, "y": 0.5},
+					"startShift": 0.3,
+					"displayTime": 0,
+					"fadeOutTime": 0.3
+				}
+			}
+		},
+		"sound": {
+			"shot": "laser_shot",
 			"hit": "falconet_hit"
 		}
 	}

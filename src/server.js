@@ -56,15 +56,15 @@ function main() {
 		 console.log((new Date()) + ' Connection !');
 		 socket.emit('helo');
 		 socket.emit('field', {fieldStr: jsein.stringify(fieldEngine.field)});
-		 var car = fieldEngine.addCar();
-		 console.log(car);
-		 io.sockets.emit('addCar', {carStr: jsein.stringify(car)});
-		 socket.emit('carInfo', {childId: car.childId});
+		 //io.sockets.emit('addCar', {carStr: jsein.stringify(car)});
+		 //socket.emit('carInfo', {childId: car.childId});
 
 		 var index = '' + clientCounter++;
 		 console.log((new Date()) + ' index ' + index);
 		 console.log((new Date()) + " new size of clients: " + Object.keys(clients).length);
 		
+		 var car;
+		 
 		 var sentTime;
 		 setInterval(function() {
 			 if (fieldEngine.oldTime != sentTime) {
@@ -73,6 +73,12 @@ function main() {
 			 }
 		 }, 20);
 
+		 socket.on('spawn', function (data) {
+			 car = fieldEngine.addCar(data);
+			 io.sockets.emit('addCar', {carStr: jsein.stringify(car)});
+			 socket.emit('carInfo', {childId: car.childId});
+		 });
+		 
 		 socket.on('turn', function (data) {
 			 if (car.mounts.rearCarrier) {
 				 car.mounts.rearCarrier.angle = data * car.mounts.rearCarrier.angleFactor;
@@ -96,9 +102,11 @@ function main() {
 		 });
 		 
 		 socket.on('disconnect', function() {
-			console.log('disconnect for car: ' + car.childId);
-			fieldEngine.removeCar(car);
-			io.sockets.emit('removeChild', {childId: car.childId});
+			if (car) {
+				console.log('disconnect for car: ' + car.childId);
+				fieldEngine.removeCar(car);
+				io.sockets.emit('removeChild', {childId: car.childId});
+			}
 		 });
 	
 	});

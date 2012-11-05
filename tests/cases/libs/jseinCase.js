@@ -95,7 +95,9 @@ exports.testRecoverArray = function(test) {
 	test.done();
 };
 
-exports.testParseInt = function(test) {
+exports.testParseFloat = function(test) {
+	test.equal(0, jsein.parseFloat(undefined));
+	
 	test.equal(1.654, jsein.parseFloat(1.654));
 	
 	var rand = jsein.parseFloat({min: -10, max: 5});

@@ -2,6 +2,7 @@ var
 	geo = require('geometry'),
 	container = {
 		Field: require('../frame/Field'),
+		UpdateAction: require('../frame/UpdateAction'),
 		SurfaceDescriptor: require('../surface/SurfaceDescriptor'),
 		SurfaceElement: require('../surface/SurfaceElement'),
 		Mount: require('../movable/Mount'),
